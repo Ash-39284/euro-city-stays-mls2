@@ -31,4 +31,9 @@ Furthermore, this project was built in thought of allowing user to research diff
 
 # UX
 
+## Project Goals
+
+The primary goal of this project is to allow users to have aa simple yet streamless experience when booking a holiday in Europe. I wanted to allow users to be able to easily book a destination whilst being able to research different destinations within the same place. Making booking a holiday a lot easier. 
+
+
 
