@@ -1,0 +1,21 @@
+/* General styles */
+body{
+    padding: 0;
+    margin: 0;
+}
+
+
+/* Navbar styles */
+.bg-sky {
+  background-color: #8fe7ff;
+}
+
+
+
+
+
+
+/* footer styles */
+.footer {
+  font-size: 0.9rem;
+}
