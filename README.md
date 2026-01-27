@@ -1,12 +1,10 @@
-# Euro-City-Stays
+# Euro City Stays
 
 # Introduction
 
+This project is developed for holiday seekers, to have a streamless and pleasent experience when booking and researching for a holiday destination. The project allows users to easily search for different destinations across europe, without confusion. It displays a simple layout to allow users of all computer literacy abilities to be able to use the features displayed with ease. 
 
-
-
-
-
+Furthermore, this project was built in thought of allowing user to research diffrerent destinations right from within the site. Making booking a destination all the more streamless.  
 
 # Table of Cotents
 
@@ -31,6 +29,6 @@
     - Video
     - Acknowledgements
 
-
+# UX
 
 
