@@ -3,6 +3,7 @@ body{
     font-family: 'Segoe UI', Tahoma, sans-serif;
     padding: 0;
     margin: 0;
+
 }
 
 /* Navbar styles */
@@ -22,16 +23,40 @@ body{
 
 /* search section */
 
-.search-section{
-    background-color: #FFA239;
-    border-radius: 35px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+.search-box {
+  background-color: #ffa640;
+  border-radius: 35px;
 }
 
+.search-title {
+  color: #ffe6a7;
+  font-weight: 300;
+}
 
+.search-input {
+  height: 45px;
+  border-radius: 8px;
+  border: none;
+}
+
+.search-btn {
+  background-color: #ff5a5a;
+  color: white;
+  border-radius: 8px;
+}
 
 
 /* footer styles */
 .footer {
   font-size: 0.9rem;
+}
+
+
+/* mobile media query */
+
+@media (max-width: 768px) {
+  .search-title {
+    font-size: 1.6rem;
+    text-align: center;
+  }
 }

@@ -36,29 +36,50 @@
 
 <!-- search section -->
 
-<section class="search-section">
+<section class="search-section my-5">
   <div class="container">
-    <div class="row">
-      
-      <h1 class="search-title">
-        Search for you perfect holiday
+    <div class="search-box p-5">
+
+      <h1 class="search-title mb-4">
+        Search for your perfect holiday
       </h1>
 
-      <form>
-        <div>
-          <input type="date" placeholder="Choose your dates">
+      <form id="searchForm" class="row g-3 align-items-end">
+
+        <div class="col-lg-3 col-md-6">
+          <input
+            type="date"
+            id="dates"
+            class="form-control search-input"
+            required
+          >
         </div>
 
-        <div>
-          <input type="text" placeholder="Destination">
+        <div class="col-lg-3 col-md-6">
+          <input
+            type="text"
+            id="destination"
+            class="form-control search-input"
+            placeholder="Destination"
+            required
+          >
         </div>
 
-        <div>
-          <input type="number" placeholder="Who's going?">
+        <div class="col-lg-3 col-md-6">
+          <input
+            type="number"
+            id="guests"
+            class="form-control search-input"
+            placeholder="Who's going?"
+            min="1"
+            required
+          >
         </div>
 
-        <div>
-          <button type="button" id="search-btn" class="btn btn-danger">Search for your holiday!</button>
+        <div class="col-lg-3 col-md-6 d-grid">
+          <button type="submit" class="btn search-btn btn-danger">
+            Search for your holiday
+          </button>
         </div>
 
       </form>
@@ -66,19 +87,11 @@
   </div>
 </section>
 
-
-
-
-
-
-
-
-
 <!-- Images Section -->
 
 <section class="home-images ">
   <div class="container">
-    <div class="row g-4 text-center">
+    <div class="row g-4 text-center p-5">
       <div class="col-md-4">
         <img  src="./assets/images/aero-view.jpg" class="image-fluid rounded-4" alt="view of a country landscape from an aeroplane">
       </div>
