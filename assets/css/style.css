@@ -20,6 +20,13 @@ body{
 }
 
 
+/* search section */
+
+.search-section{
+    background-color: #FFA239;
+    border-radius: 35px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
 
 
 /* footer styles */
