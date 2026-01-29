@@ -84,11 +84,33 @@ body{
   color: #777;
 }
 
+.place-card.active {
+  outline: 3px solid #ff5a5a;
+  transform: translateY(-2px);
+}
+
+
 /* MAP */
 .map-container {
   height: 300px;
   width: 100%;
   border-radius: 12px;
+}
+
+/* Places styles */
+.place-details {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.place-details img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
 
