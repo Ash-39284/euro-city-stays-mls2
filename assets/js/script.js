@@ -1,22 +1,20 @@
 // google maps API key
 // AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I
 
-
-// Home page search feature
-
 $('#searchForm').on('submit', function (e) {
   e.preventDefault();
 
-  localStorage.setItem(
-    'searchCity',
-    $('#destination').val().toLowerCase().trim()
-  );
+  const destination = $('#destination').val().trim().toLowerCase();
 
-  localStorage.setItem(
-    'searchGuests',
-    $('#guests').val()
-  );
+  if (!destination) {
+    alert('Please enter a destination');
+    return;
+  }
 
-  window.location.href = 'destinations.html';
+  // Redirect to destinations page with query
+  window.location.href = `destinations.html?city=${encodeURIComponent(destination)}`;
 });
+
+
+
 

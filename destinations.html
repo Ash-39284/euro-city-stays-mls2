@@ -11,7 +11,65 @@
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
      <!-- map script -->
-      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I&callback=initMap"asyncdefer></script>
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I&callback=initMap"async defer></script>
+
+<script>
+  let map;
+  let markers = [];
+
+  function initMap() {
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: { lat: 50.8503, lng: 4.3517 }, // Europe center
+      zoom: 5,
+      mapTypeControl: false,
+      streetViewControl: false
+    });
+
+    syncResultsWithMap();
+  }
+
+  function syncResultsWithMap() {
+    const params = new URLSearchParams(window.location.search);
+    const city = params.get("city");
+
+    document.querySelectorAll(".place-card").forEach(card => {
+      const cardCity = card.dataset.city;
+      const lat = parseFloat(card.dataset.lat);
+      const lng = parseFloat(card.dataset.lng);
+
+      // Hide non-matching cards
+      if (city && !cardCity.includes(city)) {
+        card.style.display = "none";
+        return;
+      }
+
+      card.style.display = "flex";
+
+      // Create marker
+      const marker = new google.maps.Marker({
+        position: { lat, lng },
+        map,
+        title: cardCity
+      });
+
+      markers.push(marker);
+
+      // Card → Map
+      card.addEventListener("click", () => {
+        map.panTo(marker.getPosition());
+        map.setZoom(7);
+      });
+    });
+
+    // Pan map to first visible marker
+    if (markers.length > 0) {
+      map.panTo(markers[0].getPosition());
+      map.setZoom(6);
+    }
+  }
+</script>
+
+
 
 </head>
 <body>
@@ -36,163 +94,160 @@
   </div>
 </nav>
 
+<!-- DESTINATIONS -->
+<section class="container my-5">
 
-<!-- Location cards section  -->
-
-<div class="col-md-4">
-  <div class="place-card"
-       data-city="paris"
-       data-capacity="2"
-       data-lat="48.8566"
-       data-lng="2.3522">
-
-    <!-- <img src="images/paris.jpg" alt="Paris"> -->
-    <div>
-      <h6>Paris</h6>
-      <small>Paris, France</small>
+  <!-- PARIS -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="place-card" 
+            data-city="paris"
+            data-lat="48.8566"
+            data-lng="2.3522">
+        <img src="images/paris.jpg" alt="Paris">
+        <div>
+          <h6>Paris</h6>
+          <small>Paris, France</small>
+        </div>
+      </div>
     </div>
 
+    <div class="col-md-4">
+      <div class="place-card" 
+            data-city="vienna"
+            data-lat="48.2082"
+            data-lng="16.3738">
+        <img src="images/vienna.jpg" alt="Vienna">
+        <div>
+          <h6>Vienna</h6>
+          <small>Vienna, Austria</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="place-card" 
+            data-city="copenhagen"
+            data-lat="55.6761"
+            data-lng="'12.5683">
+        <img src="images/copenhagen.jpg" alt="Copenhagen">
+        <div>
+          <h6>Copenhagen</h6>
+          <small>Copenhagen, Denmark</small>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<div>
-    <div class="place-card"
-        data-city="London"
-        data-capacity="2"
-        data-lat="51.5074"
-        data-lng="-0.1278">
-
+  <!-- PRAGUE -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="place-card" 
+            data-city="london"
+            data-lat="51.5074"
+            data-lng="-0.1278">
+        <img src="images/london.jpg" alt="London">
         <div>
-            <h6>London</h6>
-            <small>London, United Kingdom</small>
+          <h6>London</h6>
+          <small>London, UK</small>
         </div>
+      </div>
     </div>
-</div>
 
-<div>
-    <div class="place-card"
-        data-city="Prague"
-        data-capacity="2"
-        data-lat="50.0755"
-        data-lng="14.4378">
-
+    <div class="col-md-4">
+      <div class="place-card" 
+            data-city="prague"
+            data-lat="50.0755"
+            data-lng="14.4378">
+        <img src="images/prague.jpg" alt="Prague">
         <div>
-            <h6>Prague</h6>
-            <small>Prague, Czech republic</small>
+          <h6>Prague</h6>
+          <small>Prague, Czechia</small>
         </div>
+      </div>
     </div>
-</div>
 
-<div>
-    <div class="place-card"
-        data-city="Vienna"
-        data-capacity="2"
-        data-lat="48.2082"
-        data-lng="14.4378">
-
+    <div class="col-md-4">
+      <div class="place-card" 
+            data-city="warsaw"
+            data-lat="52.2297"
+            data-lng="21.0122">
+        <img src="images/warsaw.jpg" alt="Warsaw">
         <div>
-            <h6>Vienna</h6>
-            <small>Vienna, Austria</small>
+          <h6>Warsaw</h6>
+          <small>Warsaw, Poland</small>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<div>
-    <div class="place-card"
-        data-city="Berlin"
-        data-capacity="2"
-        data-lat="52.5200"
-        data-lng="13.4050">
-
+  <!-- THIRD ROW -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="place-card" 
+            data-city="berlin"
+            data-lat="52.5200"
+            data-lng="13.4050">
+        <img src="images/berlin.jpg" alt="Berlin">
         <div>
-            <h6>Berlin</h6>
-            <small>Berlin, Germany</small>
+          <h6>Berlin</h6>
+          <small>Berlin, Germany</small>
         </div>
+      </div>
     </div>
-</div>
 
-<div>
-    <div class="place-card"
-        data-city="Madrid"
-        data-capacity="2"
-        data-lat="40.4168"
-        data-lng="-3.7038">
-
+    <div class="col-md-4">
+      <div class="place-card" 
+            data-city="madrid"
+            data-lat="40.168"
+            data-lng="-3.7038">
+        <img src="images/madrid.jpg" alt="Madrid">
         <div>
-            <h6>Madrid</h6>
-            <small>Madrid, Spain</small>
+          <h6>Madrid</h6>
+          <small>Madrid, Spain</small>
         </div>
+      </div>
     </div>
-</div>
 
-<div>
-    <div class="place-card"
-        data-city="Lisbon"
-        data-capacity="2"
-        data-lat="38.7223"
-        data-lng="-9.1393">
-
+    <div class="col-md-4">
+      <div class="place-card" 
+            data-city="lisbon"
+            data-lat="38.7223"
+            data-lng="-9.1393">
+        <img src="images/lisbon.jpg" alt="Lisbon">
         <div>
-            <h6>Lisbon</h6>
-            <small>Lisbon, Portugal</small>
+          <h6>Lisbon</h6>
+          <small>Lisbon, Portugal</small>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<div>
-    <div class="place-card"
-        data-city="Warsaw"
-        data-capacity="2"
-        data-lat="52.2297"
-        data-lng="21.0122">
-
-        <div>
-            <h6>Warsaw</h6>
-            <small>Warsaw, Poland</small>
-        </div>
-    </div>
-</div>
-
-<div>
-    <div class="place-card"
-        data-city="Copenhagen"
-        data-capacity="2"
-        data-lat="55.6761"
-        data-lng="12.5683">
-
-        <div>
-            <h6>Copenhagen</h6>
-            <small>Copenhagen, Denmark</small>
-        </div>
-    </div>
-</div>
-
-<!-- Map container -->
-
-<div id="map" class="map-container"></div>
-
-<p id="noResults" class="text-center text-muted mt-4 d-none">
-  No destinations match your search.
-</p>
+  <!-- MAP PLACEHOLDER -->
+ <div id="map" class="map-container"></div>
 
 
+</section>
 
-<!-- Footer section -->
-<footer class="footer bg-danger text-light py-3">
+<!-- FOOTER -->
+<footer class="footer bg-danger text-light py-3 mt-5">
   <div class="container d-flex justify-content-between align-items-center flex-wrap">
     <small>Copyright © 2026 Ashley Roberts. All rights reserved.</small>
     <strong>Euro City Stays</strong>
   </div>
 </footer>
 
-
-<!-- JavaScript script  -->
-    <script src="./assets/js/script.js"></script>
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
 
 <!-- FontAwesome script -->
 <script src="https://kit.fontawesome.com/c818da147c.js" crossorigin="anonymous"></script>
 
 <!-- Bootstrap script -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
 </body>
+
 </html>

@@ -45,21 +45,50 @@ body{
   border-radius: 8px;
 }
 
-/* map styling */
-
-.map-container {
-  height: 250px;
-  border-radius: 12px;
-  margin-top: 30px;
+/* SECTION TITLES */
+.section-title {
+  color: #bdbdbd;
+  font-weight: 400;
 }
 
+/* PLACE CARDS */
 .place-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
 
 .place-card:hover {
   transform: translateY(-3px);
+}
+
+.place-card img {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.place-card h6 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.place-card small {
+  color: #777;
+}
+
+/* MAP */
+.map-container {
+  height: 300px;
+  width: 100%;
+  border-radius: 12px;
 }
 
 
