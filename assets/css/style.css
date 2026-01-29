@@ -45,6 +45,23 @@ body{
   border-radius: 8px;
 }
 
+/* map styling */
+
+.map-container {
+  height: 250px;
+  border-radius: 12px;
+  margin-top: 30px;
+}
+
+.place-card {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.place-card:hover {
+  transform: translateY(-3px);
+}
+
 
 /* footer styles */
 .footer {

@@ -10,6 +10,9 @@
     <!-- Bootstrap link -->
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
+     <!-- map script -->
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I&callback=initMap"asyncdefer></script>
+
 </head>
 <body>
     <!-- Navbar section -->
@@ -43,7 +46,7 @@
        data-lat="48.8566"
        data-lng="2.3522">
 
-    <img src="images/paris.jpg" alt="Paris">
+    <!-- <img src="images/paris.jpg" alt="Paris"> -->
     <div>
       <h6>Paris</h6>
       <small>Paris, France</small>
@@ -158,11 +161,19 @@
         data-lng="12.5683">
 
         <div>
-            <h6></h6>
+            <h6>Copenhagen</h6>
             <small>Copenhagen, Denmark</small>
         </div>
     </div>
 </div>
+
+<!-- Map container -->
+
+<div id="map" class="map-container"></div>
+
+<p id="noResults" class="text-center text-muted mt-4 d-none">
+  No destinations match your search.
+</p>
 
 
 
