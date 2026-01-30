@@ -57,8 +57,6 @@ The code to fix it:
 
 
 
-
-
 The second bug I encountered was when I connected the cards to the google maps API the "Copenhagen" card wouldn't interact with the map. The error is show below:
 
 ![Copenhagen card issue](./assets/images/card-issue.png)
@@ -70,6 +68,8 @@ The code issue was that I put in the `data-lng` class in incorrect. This was the
 This is the code that fixed the error:
 
 `data-lng="12.5683"`
+
+
 
 
 

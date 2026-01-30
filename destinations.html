@@ -11,91 +11,123 @@
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
      <!-- map script -->
-      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I&libraries=places&callback=initMap"
-        async
-        defer>
-      </script>
-
+      <script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I&libraries=places&v=beta"
+  async
+  defer>
+</script>
 <script>
-  let map;
-  let service;
+/* ===============================
+   SEARCH (index.html only)
+================================ */
+if (document.getElementById("searchForm")) {
+  $('#searchForm').on('submit', function (e) {
+    e.preventDefault();
 
-  function initMap() {
-    map = new google.maps.Map(document.getElementById("map"), {
-      center: { lat: 50.8503, lng: 4.3517 },
-      zoom: 5,
-    });
+    const destination = $('#destination').val().trim().toLowerCase();
+    if (!destination) return alert("Please enter a destination");
 
-    service = new google.maps.places.PlacesService(map);
+    window.location.href =
+      `destinations.html?city=${encodeURIComponent(destination)}`;
+  });
+}
 
-    attachCardClickHandlers();
-  }
+/* ===============================
+   GOOGLE MAPS + PLACES
+================================ */
+let map;
 
+async function initMap() {
+  await google.maps.importLibrary("maps");
+  await google.maps.importLibrary("places");
+
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 50.8503, lng: 4.3517 },
+    zoom: 5,
+  });
+
+  attachCardClickHandlers();
+}
+
+window.addEventListener("load", () => {
+  if (window.google && google.maps) initMap();
+});
+
+/* ===============================
+   CARD INTERACTIONS
+================================ */
 function attachCardClickHandlers() {
   document.querySelectorAll(".place-card").forEach(card => {
-    card.addEventListener("click", () => {
-
-      // Active card highlight
-      document.querySelectorAll(".place-card").forEach(c =>
-        c.classList.remove("active")
-      );
-      card.classList.add("active");
-
-      const city = card.dataset.city;
+    card.addEventListener("click", async () => {
       const lat = parseFloat(card.dataset.lat);
       const lng = parseFloat(card.dataset.lng);
 
       map.panTo({ lat, lng });
-      map.setZoom(8);
+      map.setZoom(10);
 
-      fetchPlaceDetails(city, { lat, lng });
+      await fetchPOIs(card, "tourist_attraction");
     });
   });
 }
 
-  function fetchPlaceDetails(city, location) {
-    const request = {
-      query: city,
-      fields: ["name", "formatted_address", "rating", "photos"],
-      locationBias: location
-    };
+/* ===============================
+   FETCH POIs (NEW Places API)
+================================ */
+async function fetchPOIs(card, type) {
+  const lat = parseFloat(card.dataset.lat);
+  const lng = parseFloat(card.dataset.lng);
+  const poiList = card.querySelector(".poi-results");
 
-    service.findPlaceFromQuery(request, (results, status) => {
-      if (status !== google.maps.places.PlacesServiceStatus.OK || !results[0]) {
-        console.warn("No place data found");
-        return;
-      }
+  if (!poiList) return;
 
-      displayPlaceDetails(results[0]);
+  poiList.innerHTML = "<li>Loading...</li>";
+
+  try {
+    const { places } = await google.maps.places.Place.searchNearby({
+      locationRestriction: {
+        center: { lat, lng },
+        radius: 3000,
+      },
+      includedTypes: [type],
+      maxResultCount: 5,
+      fields: ["displayName", "rating"],
     });
-  }
 
-  function displayPlaceDetails(place) {
-    document.getElementById("placeDetails").classList.remove("d-none");
+    poiList.innerHTML = "";
 
-    document.getElementById("placeName").textContent = place.name;
-    document.getElementById("placeAddress").textContent =
-      place.formatted_address || "Address unavailable";
-
-    document.getElementById("placeRating").textContent =
-      place.rating ? `⭐ Rating: ${place.rating}` : "No rating available";
-
-    const photosContainer = document.getElementById("placePhotos");
-    photosContainer.innerHTML = "";
-
-    if (place.photos) {
-      place.photos.slice(0, 3).forEach(photo => {
-        const img = document.createElement("img");
-        img.src = photo.getUrl({ maxWidth: 120, maxHeight: 120 });
-        img.style.borderRadius = "8px";
-        photosContainer.appendChild(img);
-      });
+    if (!places || !places.length) {
+      poiList.innerHTML = "<li>No results found</li>";
+      return;
     }
+
+    places.forEach(place => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <strong>${place.displayName}</strong>
+        ${place.rating ? `<span> ⭐ ${place.rating}</span>` : ""}
+      `;
+      poiList.appendChild(li);
+    });
+
+  } catch (error) {
+    console.error("Places API error:", error);
+    poiList.innerHTML = "<li>Error loading places</li>";
   }
+}
+
+/* ===============================
+   OPTIONAL BUTTON HOOKS
+================================ */
+window.showAttractions = card =>
+  fetchPOIs(card, "tourist_attraction");
+
+window.showRestaurants = card =>
+  fetchPOIs(card, "restaurant");
+
+window.showHotels = card =>
+  fetchPOIs(card, "lodging");
+
 </script>
-
-
-
 </head>
 <body>
     <!-- Navbar section -->
@@ -125,17 +157,16 @@ function attachCardClickHandlers() {
   <!-- PARIS -->
   <div class="row g-4 mb-5">
     <div class="col-md-4">
-      <div class="place-card" 
-            data-city="paris"
-            data-lat="48.8566"
-            data-lng="2.3522">
-        <img src="images/paris.jpg" alt="Paris">
-        <div>
-          <h6>Paris</h6>
-          <small>Paris, France</small>
-        </div>
-      </div>
-    </div>
+     <div class="place-card" data-city="paris" data-lat="48.8566" data-lng="2.3522">
+  <img src="images/paris.jpg" alt="Paris">
+  <div>
+    <h6>Paris</h6>
+    <small>Paris, France</small>
+  </div>
+  <ul class="poi-results list-unstyled mt-2"></ul>
+</div>
+</div>
+
 
     <div class="col-md-4">
       <div class="place-card" 
@@ -147,6 +178,7 @@ function attachCardClickHandlers() {
           <h6>Vienna</h6>
           <small>Vienna, Austria</small>
         </div>
+             <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
 
@@ -160,11 +192,11 @@ function attachCardClickHandlers() {
           <h6>Copenhagen</h6>
           <small>Copenhagen, Denmark</small>
         </div>
+              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
   </div>
 
-  <!-- PRAGUE -->
   <div class="row g-4 mb-5">
     <div class="col-md-4">
       <div class="place-card" 
@@ -176,6 +208,7 @@ function attachCardClickHandlers() {
           <h6>London</h6>
           <small>London, UK</small>
         </div>
+            <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
 
@@ -189,6 +222,7 @@ function attachCardClickHandlers() {
           <h6>Prague</h6>
           <small>Prague, Czechia</small>
         </div>
+              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
 
@@ -202,6 +236,7 @@ function attachCardClickHandlers() {
           <h6>Warsaw</h6>
           <small>Warsaw, Poland</small>
         </div>
+              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
   </div>
@@ -218,6 +253,7 @@ function attachCardClickHandlers() {
           <h6>Berlin</h6>
           <small>Berlin, Germany</small>
         </div>
+              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
 
@@ -231,6 +267,7 @@ function attachCardClickHandlers() {
           <h6>Madrid</h6>
           <small>Madrid, Spain</small>
         </div>
+              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
 
@@ -244,6 +281,7 @@ function attachCardClickHandlers() {
           <h6>Lisbon</h6>
           <small>Lisbon, Portugal</small>
         </div>
+              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
   </div>
@@ -271,7 +309,7 @@ function attachCardClickHandlers() {
 <!-- JS -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="./assets/js/destinations.js"></script>
 
 <!-- FontAwesome script -->
 <script src="https://kit.fontawesome.com/c818da147c.js" crossorigin="anonymous"></script>
