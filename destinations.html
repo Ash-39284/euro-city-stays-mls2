@@ -17,20 +17,6 @@
   defer>
 </script>
 <script>
-/* ===============================
-   SEARCH (index.html only)
-================================ */
-if (document.getElementById("searchForm")) {
-  $('#searchForm').on('submit', function (e) {
-    e.preventDefault();
-
-    const destination = $('#destination').val().trim().toLowerCase();
-    if (!destination) return alert("Please enter a destination");
-
-    window.location.href =
-      `destinations.html?city=${encodeURIComponent(destination)}`;
-  });
-}
 
 /* ===============================
    GOOGLE MAPS + PLACES
@@ -100,32 +86,38 @@ async function fetchPOIs(card, type) {
       return;
     }
 
-    places.forEach(place => {
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <strong>${place.displayName}</strong>
-        ${place.rating ? `<span> ⭐ ${place.rating}</span>` : ""}
-      `;
-      poiList.appendChild(li);
-    });
+places.forEach(place => {
+  const li = document.createElement("li");
+  li.className = "poi-item";
+
+  li.innerHTML = `
+    <div class="poi-card">
+      <div class="poi-header">
+        <span class="poi-name">${place.displayName}</span>
+        ${place.rating ? `<span class="poi-rating">⭐ ${place.rating}</span>` : ""}
+      </div>
+      <div class="poi-type">${formatType(type)}</div>
+    </div>
+  `;
+
+  poiList.appendChild(li);
+});
+
 
   } catch (error) {
     console.error("Places API error:", error);
     poiList.innerHTML = "<li>Error loading places</li>";
   }
-}
 
-/* ===============================
-   OPTIONAL BUTTON HOOKS
-================================ */
-window.showAttractions = card =>
-  fetchPOIs(card, "tourist_attraction");
+  function formatType(type) {
+  switch (type) {
+    case "restaurant": return "🍽 Restaurant";
+    case "lodging": return "🏨 Hotel";
+    default: return "📍 Attraction";
+  }
+};
+};
 
-window.showRestaurants = card =>
-  fetchPOIs(card, "restaurant");
-
-window.showHotels = card =>
-  fetchPOIs(card, "lodging");
 
 </script>
 </head>
@@ -163,9 +155,26 @@ window.showHotels = card =>
     <h6>Paris</h6>
     <small>Paris, France</small>
   </div>
+
+   <div class="d-flex gap-2 mt-2">
+    <button class="btn btn-sm btn-outline-primary"
+      onclick="showAttractions(this)">
+      Attractions
+    </button>
+    <button class="btn btn-sm btn-outline-success"
+      onclick="showRestaurants(this)">
+      Food
+    </button>
+    <button class="btn btn-sm btn-outline-danger"
+      onclick="showHotels(this)">
+      Hotels
+    </button>
+  </div>
+
   <ul class="poi-results list-unstyled mt-2"></ul>
 </div>
 </div>
+
 
 
     <div class="col-md-4">
@@ -178,6 +187,22 @@ window.showHotels = card =>
           <h6>Vienna</h6>
           <small>Vienna, Austria</small>
         </div>
+
+         <div class="d-flex gap-2 mt-2">
+    <button class="btn btn-sm btn-outline-primary"
+      onclick="showAttractions(this)">
+      Attractions
+    </button>
+    <button class="btn btn-sm btn-outline-success"
+      onclick="showRestaurants(this)">
+      Food
+    </button>
+    <button class="btn btn-sm btn-outline-danger"
+      onclick="showHotels(this)">
+      Hotels
+    </button>
+  </div>
+
              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
@@ -192,6 +217,22 @@ window.showHotels = card =>
           <h6>Copenhagen</h6>
           <small>Copenhagen, Denmark</small>
         </div>
+
+         <div class="d-flex gap-2 mt-2">
+    <button class="btn btn-sm btn-outline-primary"
+      onclick="showAttractions(this)">
+      Attractions
+    </button>
+    <button class="btn btn-sm btn-outline-success"
+      onclick="showRestaurants(this)">
+      Food
+    </button>
+    <button class="btn btn-sm btn-outline-danger"
+      onclick="showHotels(this)">
+      Hotels
+    </button>
+  </div>
+
               <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
@@ -208,6 +249,22 @@ window.showHotels = card =>
           <h6>London</h6>
           <small>London, UK</small>
         </div>
+
+         <div class="d-flex gap-2 mt-2">
+    <button class="btn btn-sm btn-outline-primary"
+      onclick="showAttractions(this)">
+      Attractions
+    </button>
+    <button class="btn btn-sm btn-outline-success"
+      onclick="showRestaurants(this)">
+      Food
+    </button>
+    <button class="btn btn-sm btn-outline-danger"
+      onclick="showHotels(this)">
+      Hotels
+    </button>
+  </div>
+
             <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
@@ -222,6 +279,22 @@ window.showHotels = card =>
           <h6>Prague</h6>
           <small>Prague, Czechia</small>
         </div>
+
+ <div class="d-flex gap-2 mt-2">
+    <button class="btn btn-sm btn-outline-primary"
+      onclick="showAttractions(this)">
+      Attractions
+    </button>
+    <button class="btn btn-sm btn-outline-success"
+      onclick="showRestaurants(this)">
+      Food
+    </button>
+    <button class="btn btn-sm btn-outline-danger"
+      onclick="showHotels(this)">
+      Hotels
+    </button>
+  </div>
+
               <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
@@ -236,6 +309,22 @@ window.showHotels = card =>
           <h6>Warsaw</h6>
           <small>Warsaw, Poland</small>
         </div>
+        
+         <div class="d-flex gap-2 mt-2">
+    <button class="btn btn-sm btn-outline-primary"
+      onclick="showAttractions(this)">
+      Attractions
+    </button>
+    <button class="btn btn-sm btn-outline-success"
+      onclick="showRestaurants(this)">
+      Food
+    </button>
+    <button class="btn btn-sm btn-outline-danger"
+      onclick="showHotels(this)">
+      Hotels
+    </button>
+  </div>
+
               <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
@@ -253,6 +342,22 @@ window.showHotels = card =>
           <h6>Berlin</h6>
           <small>Berlin, Germany</small>
         </div>
+
+         <div class="d-flex gap-2 mt-2">
+    <button class="btn btn-sm btn-outline-primary"
+      onclick="showAttractions(this)">
+      Attractions
+    </button>
+    <button class="btn btn-sm btn-outline-success"
+      onclick="showRestaurants(this)">
+      Food
+    </button>
+    <button class="btn btn-sm btn-outline-danger"
+      onclick="showHotels(this)">
+      Hotels
+    </button>
+  </div>
+
               <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
@@ -267,6 +372,23 @@ window.showHotels = card =>
           <h6>Madrid</h6>
           <small>Madrid, Spain</small>
         </div>
+
+
+         <div class="d-flex gap-2 mt-2">
+    <button class="btn btn-sm btn-outline-primary"
+      onclick="showAttractions(this)">
+      Attractions
+    </button>
+    <button class="btn btn-sm btn-outline-success"
+      onclick="showRestaurants(this)">
+      Food
+    </button>
+    <button class="btn btn-sm btn-outline-danger"
+      onclick="showHotels(this)">
+      Hotels
+    </button>
+  </div>
+
               <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
@@ -281,6 +403,24 @@ window.showHotels = card =>
           <h6>Lisbon</h6>
           <small>Lisbon, Portugal</small>
         </div>
+
+
+ <div class="d-flex gap-2 mt-2">
+    <button class="btn btn-sm btn-outline-primary"
+      onclick="showAttractions(this)">
+      Attractions
+    </button>
+    <button class="btn btn-sm btn-outline-success"
+      onclick="showRestaurants(this)">
+      Food
+    </button>
+    <button class="btn btn-sm btn-outline-danger"
+      onclick="showHotels(this)">
+      Hotels
+    </button>
+  </div>
+
+
               <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>

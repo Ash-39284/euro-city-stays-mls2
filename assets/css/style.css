@@ -51,43 +51,50 @@ body{
   font-weight: 400;
 }
 
-/* PLACE CARDS */
-.place-card {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  background: #fff;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  cursor: pointer;
-  transition: transform 0.2s ease;
+/* POI LIST */
+.poi-results {
+  margin-top: 10px;
 }
 
-.place-card:hover {
-  transform: translateY(-3px);
-}
-
-.place-card img {
-  width: 60px;
-  height: 60px;
+/* Individual POI card */
+.poi-card {
+  background: #f8f9fa;
   border-radius: 10px;
-  object-fit: cover;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
-.place-card h6 {
-  margin: 0;
-  font-size: 0.95rem;
+/* Header row */
+.poi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.place-card small {
-  color: #777;
+/* Place name */
+.poi-name {
+  font-weight: 600;
+  color: #333;
 }
 
-.place-card.active {
-  outline: 3px solid #ff5a5a;
-  transform: translateY(-2px);
+/* Rating badge */
+.poi-rating {
+  background: #ffc107;
+  color: #000;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.75rem;
 }
+
+/* Category label */
+.poi-type {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 2px;
+}
+
 
 
 /* MAP */
