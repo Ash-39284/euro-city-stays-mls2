@@ -17,12 +17,11 @@
   defer>
 </script>
 <script>
-
-/* ===============================
-   GOOGLE MAPS + PLACES
-================================ */
 let map;
 
+/* ===============================
+   INIT MAP
+================================ */
 async function initMap() {
   await google.maps.importLibrary("maps");
   await google.maps.importLibrary("places");
@@ -31,42 +30,44 @@ async function initMap() {
     center: { lat: 50.8503, lng: 4.3517 },
     zoom: 5,
   });
-
-  attachCardClickHandlers();
 }
 
-window.addEventListener("load", () => {
-  if (window.google && google.maps) initMap();
-});
+window.addEventListener("load", initMap);
 
 /* ===============================
-   CARD INTERACTIONS
+   BUTTON HANDLERS
 ================================ */
-function attachCardClickHandlers() {
-  document.querySelectorAll(".place-card").forEach(card => {
-    card.addEventListener("click", async () => {
-      const lat = parseFloat(card.dataset.lat);
-      const lng = parseFloat(card.dataset.lng);
+function showAttractions(btn) {
+  handleCategoryClick(btn, "tourist_attraction");
+}
 
-      map.panTo({ lat, lng });
-      map.setZoom(10);
+function showRestaurants(btn) {
+  handleCategoryClick(btn, "restaurant");
+}
 
-      await fetchPOIs(card, "tourist_attraction");
-    });
-  });
+function showHotels(btn) {
+  handleCategoryClick(btn, "lodging");
+}
+
+function handleCategoryClick(button, type) {
+  const card = button.closest(".place-card");
+  fetchPOIs(card, type);
+
+  const lat = parseFloat(card.dataset.lat);
+  const lng = parseFloat(card.dataset.lng);
+  map.panTo({ lat, lng });
+  map.setZoom(11);
 }
 
 /* ===============================
-   FETCH POIs (NEW Places API)
+   FETCH PLACES
 ================================ */
 async function fetchPOIs(card, type) {
   const lat = parseFloat(card.dataset.lat);
   const lng = parseFloat(card.dataset.lng);
-  const poiList = card.querySelector(".poi-results");
+  const list = card.querySelector(".poi-results");
 
-  if (!poiList) return;
-
-  poiList.innerHTML = "<li>Loading...</li>";
+  list.innerHTML = "<li>Loading places...</li>";
 
   try {
     const { places } = await google.maps.places.Place.searchNearby({
@@ -79,47 +80,83 @@ async function fetchPOIs(card, type) {
       fields: ["displayName", "rating"],
     });
 
-    poiList.innerHTML = "";
+    list.innerHTML = "";
 
-    if (!places || !places.length) {
-      poiList.innerHTML = "<li>No results found</li>";
+    if (!places || places.length === 0) {
+      list.innerHTML = "<li>No results found</li>";
       return;
     }
 
-places.forEach(place => {
+    places.forEach(place => {
   const li = document.createElement("li");
-  li.className = "poi-item";
+
+  const photoUrl = place.photos?.length
+    ? place.photos[0].getURI({ maxWidth: 200, maxHeight: 150 })
+    : null;
 
   li.innerHTML = `
-    <div class="poi-card">
-      <div class="poi-header">
-        <span class="poi-name">${place.displayName}</span>
-        ${place.rating ? `<span class="poi-rating">⭐ ${place.rating}</span>` : ""}
+    <div class="poi-card d-flex gap-2">
+      ${photoUrl ? `<img src="${photoUrl}" class="poi-photo">` : ""}
+      <div>
+        <div class="poi-header">
+          <span class="poi-name">${place.displayName}</span>
+          ${place.rating ? `<span class="poi-rating">⭐ ${place.rating}</span>` : ""}
+        </div>
+        <div class="poi-type">${formatType(type)}</div>
       </div>
-      <div class="poi-type">${formatType(type)}</div>
     </div>
   `;
 
-  poiList.appendChild(li);
+  list.appendChild(li);
 });
 
 
-  } catch (error) {
-    console.error("Places API error:", error);
-    poiList.innerHTML = "<li>Error loading places</li>";
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = "<li>Error loading places</li>";
   }
+}
 
-  function formatType(type) {
-  switch (type) {
-    case "restaurant": return "🍽 Restaurant";
-    case "lodging": return "🏨 Hotel";
-    default: return "📍 Attraction";
-  }
+/* ===============================
+   LABELS
+================================ */
+function formatType(type) {
+  if (type === "restaurant") return "🍽 Restaurant";
+  if (type === "lodging") return "🏨 Hotel";
+  return "📍 Attraction";
+}
+
+
+/*================================
+DESTINATIONS CARDS STYLING
+======================== */
+function collapseAllExcept(activeCard) {
+  document.querySelectorAll(".poi-results").forEach(list => {
+    if (!activeCard.contains(list)) {
+      list.innerHTML = "";
+    }
+  });
 };
+
+
+function handleCategoryClick(button, type) {
+  const card = button.closest(".place-card");
+
+  collapseAllExcept(card);
+  fetchPOIs(card, type);
+
+  const lat = parseFloat(card.dataset.lat);
+  const lng = parseFloat(card.dataset.lng);
+  map.panTo({ lat, lng });
+  map.setZoom(11);
 };
+
+
+
 
 
 </script>
+
 </head>
 <body>
     <!-- Navbar section -->

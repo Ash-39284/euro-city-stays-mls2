@@ -66,6 +66,14 @@ body{
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
+.poi-photo {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+
 /* Header row */
 .poi-header {
   display: flex;
