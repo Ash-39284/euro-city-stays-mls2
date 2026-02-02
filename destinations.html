@@ -35,6 +35,10 @@ async function initMap() {
   autoOpenCityFromSearch();
 }
 
+window.addEventListener("load", () => {
+  if (window.google && google.maps) initMap();
+});
+
 /* ===============================
    AUTO-OPEN CITY FROM URL
 ================================ */
@@ -43,14 +47,11 @@ function autoOpenCityFromSearch() {
   const city = params.get("city");
   if (!city) return;
 
-  const card = document.querySelector(
-    `.place-card[data-city="${city.toLowerCase()}"]`
-  );
-
+  const card = document.querySelector(`.place-card[data-city="${city.toLowerCase()}"]`);
   if (!card) return;
 
   card.scrollIntoView({ behavior: "smooth", block: "center" });
-  card.click(); // triggers everything below
+  openCard(card, "tourist_attraction");
 }
 
 /* ===============================
@@ -58,71 +59,90 @@ function autoOpenCityFromSearch() {
 ================================ */
 function attachCardClickHandlers() {
   document.querySelectorAll(".place-card").forEach(card => {
-    card.addEventListener("click", async () => {
-      collapseAllCards(card);
-
-      const lat = parseFloat(card.dataset.lat);
-      const lng = parseFloat(card.dataset.lng);
-
-      map.panTo({ lat, lng });
-      map.setZoom(11);
-
-      await fetchPOIs(card, "tourist_attraction");
+    card.addEventListener("click", () => {
+      openCard(card, "tourist_attraction");
     });
   });
+}
+
+/* ===============================
+   OPEN CARD (collapse others + zoom + load)
+================================ */
+async function openCard(card, type) {
+  collapseAllCards(card);
+
+  const lat = parseFloat(card.dataset.lat);
+  const lng = parseFloat(card.dataset.lng);
+
+  map.panTo({ lat, lng });
+  map.setZoom(11);
+
+  await fetchPOIs(card, type);
 }
 
 /* ===============================
    COLLAPSE OTHER CARDS
 ================================ */
 function collapseAllCards(activeCard) {
-  document.querySelectorAll(".poi-results").forEach(list => {
-    if (!activeCard.contains(list)) {
+  document.querySelectorAll(".place-card").forEach(card => {
+    const list = card.querySelector(".poi-results");
+    if (!list) return;
+
+    if (card === activeCard) {
+      list.classList.add("show"); // Bootstrap collapse open
+    } else {
       list.classList.remove("show");
       list.innerHTML = "";
     }
   });
-
-  const activeList = activeCard.querySelector(".poi-results");
-  if (activeList) activeList.classList.add("show");
 }
 
 /* ===============================
-   FETCH POIs
+   FETCH POIs (NEW Places API)
 ================================ */
 async function fetchPOIs(card, type) {
   const lat = parseFloat(card.dataset.lat);
   const lng = parseFloat(card.dataset.lng);
   const list = card.querySelector(".poi-results");
 
+  if (!list) return;
+
+  list.classList.add("show");
   list.innerHTML = `<li class="text-muted">Loading...</li>`;
 
   try {
     const { places } = await google.maps.places.Place.searchNearby({
-      locationRestriction: {
-        center: { lat, lng },
-        radius: 3000,
-      },
+      locationRestriction: { center: { lat, lng }, radius: 3000 },
       includedTypes: [type],
       maxResultCount: 5,
-      fields: ["displayName", "rating"],
+      fields: ["displayName", "rating", "photos", "location"],
     });
 
     list.innerHTML = "";
 
-    if (!places.length) {
+    if (!places || !places.length) {
       list.innerHTML = `<li>No places found</li>`;
       return;
     }
 
     places.forEach(place => {
+      const photoUrl = place.photos?.length
+        ? place.photos[0].getURI({ maxWidth: 200, maxHeight: 150 })
+        : null;
+
       const li = document.createElement("li");
-      li.className = "poi-card mb-2";
+      li.className = "mb-2";
 
       li.innerHTML = `
-        <div class="p-2 border rounded">
-          <strong>${place.displayName}</strong>
-          ${place.rating ? `<span class="ms-2">⭐ ${place.rating}</span>` : ""}
+        <div class="poi-card d-flex gap-2 p-2 border rounded">
+          ${photoUrl ? `<img src="${photoUrl}" class="poi-photo" alt="${place.displayName}">` : ""}
+          <div>
+            <div class="d-flex justify-content-between gap-2">
+              <strong>${place.displayName}</strong>
+              ${place.rating ? `<span>⭐ ${place.rating}</span>` : ""}
+            </div>
+            <small class="text-muted">${formatType(type)}</small>
+          </div>
         </div>
       `;
 
@@ -136,16 +156,21 @@ async function fetchPOIs(card, type) {
 }
 
 /* ===============================
-   OPTIONAL BUTTON SUPPORT
+   BUTTONS (pass button, find card)
 ================================ */
-window.showAttractions = card => fetchPOIs(card, "tourist_attraction");
-window.showRestaurants = card => fetchPOIs(card, "restaurant");
-window.showHotels = card => fetchPOIs(card, "lodging");
+window.showAttractions = (btn) => openCard(btn.closest(".place-card"), "tourist_attraction");
+window.showRestaurants = (btn) => openCard(btn.closest(".place-card"), "restaurant");
+window.showHotels = (btn) => openCard(btn.closest(".place-card"), "lodging");
 
 /* ===============================
-   BOOTSTRAP MAP LOAD
+   LABELS
 ================================ */
-window.addEventListener("load", initMap);
+function formatType(type) {
+  if (type === "restaurant") return "🍽 Restaurant";
+  if (type === "lodging") return "🏨 Hotel";
+  return "📍 Attraction";
+}
+
 
 
 </script>
@@ -202,8 +227,6 @@ window.addEventListener("load", initMap);
       Hotels
     </button>
   </div>
-
-  <ul class="poi-results list-unstyled mt-2"></ul>
 </div>
 </div>
 
@@ -235,7 +258,7 @@ window.addEventListener("load", initMap);
     </button>
   </div>
 
-             <ul class="poi-results list-unstyled mt-2"></ul>
+             
       </div>
     </div>
 
@@ -266,8 +289,6 @@ window.addEventListener("load", initMap);
       Hotels
     </button>
   </div>
-
-              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
   </div>
@@ -300,8 +321,6 @@ window.addEventListener("load", initMap);
       Hotels
     </button>
   </div>
-
-            <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
 
@@ -332,8 +351,6 @@ window.addEventListener("load", initMap);
       Hotels
     </button>
   </div>
-
-              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
 
@@ -364,8 +381,6 @@ window.addEventListener("load", initMap);
       Hotels
     </button>
   </div>
-
-              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
   </div>
@@ -399,8 +414,6 @@ window.addEventListener("load", initMap);
       Hotels
     </button>
   </div>
-
-              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
 
@@ -432,8 +445,6 @@ window.addEventListener("load", initMap);
       Hotels
     </button>
   </div>
-
-              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
 
@@ -465,9 +476,6 @@ window.addEventListener("load", initMap);
       Hotels
     </button>
   </div>
-
-
-              <ul class="poi-results list-unstyled mt-2"></ul>
       </div>
     </div>
   </div>

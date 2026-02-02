@@ -56,29 +56,66 @@
           >
         </div>
 
-       <select id="destination" class="form-select search-input" required>
-          <option value="">Select a city</option>
-          <option value="paris">Paris</option>
-          <option value="vienna">Vienna</option>
-          <option value="copenhagen">Copenhagen</option>
-          <option value="london">London</option>
-          <option value="prague">Prague</option>
-          <option value="warsaw">Warsaw</option>
-          <option value="berlin">Berlin</option>
-          <option value="madrid">Madrid</option>
-          <option value="lisbon">Lisbon</option>
+     <div class="col-lg-3 col-md-6">
+      <select id="destination" class="form-select search-input" required>
+        <option value="">Select a city</option>
+        <option value="paris">Paris</option>
+        <option value="vienna">Vienna</option>
+        <option value="copenhagen">Copenhagen</option>
+        <option value="london">London</option>
+        <option value="prague">Prague</option>
+        <option value="warsaw">Warsaw</option>
+        <option value="berlin">Berlin</option>
+        <option value="madrid">Madrid</option>
+        <option value="lisbon">Lisbon</option>
       </select>
+    </div>
 
-        <div class="col-lg-3 col-md-6">
-          <input
-            type="number"
-            id="guests"
-            class="form-control search-input"
-            placeholder="Who's going?"
-            min="1"
-            required
-          >
-        </div>
+
+
+      <div class="col-lg-3 col-md-6">
+        <select id="adults" class="form-select search-input" required>
+          <option value="0">Adults</option>
+          <option value="1">1 Adult</option>
+          <option value="2">2 Adults</option>
+          <option value="3">3 Adults</option>
+          <option value="4">4 Adults</option>
+          <option value="5">5 Adults</option>
+       </select>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+  <select id="children" class="form-select search-input" required>
+    <option value="0">Children</option>
+    <option value="1">1 Child</option>
+    <option value="2">2 Children</option>
+    <option value="3">3 Children</option>
+    <option value="4">4 Children</option>
+    <option value="5">5 Children</option>
+  </select>
+</div>
+
+<div class="col-lg-3 col-md-6">
+  <select id="Toddler" class="form-select search-input" required>
+    <option value="0">Toddlers (3-5)</option>
+    <option value="1">1 Toddler</option>
+    <option value="2">2 Toddlers</option>
+    <option value="3">3 Toddlers</option>
+    <option value="4">4 Toddlers</option>
+    <option value="5">5 Toddlers</option>
+  </select>
+</div>
+
+<div class="col-lg-3 col-md-6">
+  <select id="babies" class="form-select search-input" required>
+    <option value="0">Babies (0-3)</option>
+    <option value="1">1 Baby</option>
+    <option value="2">2 Babies</option>
+    <option value="3">3 Babies</option>
+    <option value="4">4 Babies</option>
+    <option value="5">5 Babies</option>
+  </select>
+</div>
 
         <div class="col-lg-3 col-md-6 d-grid">
           <button type="submit" class="btn search-btn btn-danger">
