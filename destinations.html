@@ -11,37 +11,50 @@
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
      <!-- map script -->
-      <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I&libraries=places&v=beta"
+     <script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I&libraries=places&v=beta&loading=async"
   async
   defer>
 </script>
+
 <script>
 let map;
+let poiMarkers = [];
+let activeCollapse = null;
 
-/* ===============================
-   INIT MAP
-================================ */
+// ---------- BOOT ----------
+window.addEventListener("load", async () => {
+  if (!window.google?.maps) {
+    console.error("Google Maps did not load.");
+    return;
+  }
+
+  await initMap();
+});
+
+// ---------- INIT MAP ----------
 async function initMap() {
   await google.maps.importLibrary("maps");
   await google.maps.importLibrary("places");
 
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 50.8503, lng: 4.3517 },
-    zoom: 5,
+    zoom: 5
   });
 
   attachCardClickHandlers();
-  autoOpenCityFromSearch();
+  await hydrateCityImages();      // loads images for .place-photo
+  autoOpenCityFromSearch();       // open city from ?city=paris
 }
 
-window.addEventListener("load", () => {
-  if (window.google && google.maps) initMap();
-});
+// ---------- CARD CLICK ----------
+function attachCardClickHandlers() {
+  document.querySelectorAll(".place-card").forEach(card => {
+    card.addEventListener("click", () => openCard(card, "tourist_attraction"));
+  });
+}
 
-/* ===============================
-   AUTO-OPEN CITY FROM URL
-================================ */
+// ---------- AUTO OPEN FROM URL ----------
 function autoOpenCityFromSearch() {
   const params = new URLSearchParams(window.location.search);
   const city = params.get("city");
@@ -54,52 +67,46 @@ function autoOpenCityFromSearch() {
   openCard(card, "tourist_attraction");
 }
 
-/* ===============================
-   CARD CLICK HANDLING
-================================ */
-function attachCardClickHandlers() {
-  document.querySelectorAll(".place-card").forEach(card => {
-    card.addEventListener("click", () => {
-      openCard(card, "tourist_attraction");
-    });
-  });
-}
-
-/* ===============================
-   OPEN CARD (collapse others + zoom + load)
-================================ */
+// ---------- OPEN CARD ----------
 async function openCard(card, type) {
-  collapseAllCards(card);
+  // close other cards
+  closeAllPoiListsExcept(card);
 
+  // zoom map to city
   const lat = parseFloat(card.dataset.lat);
   const lng = parseFloat(card.dataset.lng);
-
   map.panTo({ lat, lng });
-  map.setZoom(11);
+  map.setZoom(12);
+
+  // open this card's collapse
+  const list = card.querySelector(".poi-results");
+  if (list) {
+    const collapse = new bootstrap.Collapse(list, { toggle: false });
+    collapse.show();
+    activeCollapse = collapse;
+  }
 
   await fetchPOIs(card, type);
 }
 
-/* ===============================
-   COLLAPSE OTHER CARDS
-================================ */
-function collapseAllCards(activeCard) {
+// ---------- CLOSE OTHER COLLAPSES ----------
+function closeAllPoiListsExcept(activeCard) {
   document.querySelectorAll(".place-card").forEach(card => {
+    if (card === activeCard) return;
+
     const list = card.querySelector(".poi-results");
     if (!list) return;
 
-    if (card === activeCard) {
-      list.classList.add("show"); // Bootstrap collapse open
-    } else {
-      list.classList.remove("show");
-      list.innerHTML = "";
-    }
+    // close with bootstrap collapse
+    const collapse = bootstrap.Collapse.getInstance(list) || new bootstrap.Collapse(list, { toggle: false });
+    collapse.hide();
+
+    // clear results
+    list.innerHTML = "";
   });
 }
 
-/* ===============================
-   FETCH POIs (NEW Places API)
-================================ */
+// ---------- FETCH POIS + MARKERS ----------
 async function fetchPOIs(card, type) {
   const lat = parseFloat(card.dataset.lat);
   const lng = parseFloat(card.dataset.lng);
@@ -107,64 +114,121 @@ async function fetchPOIs(card, type) {
 
   if (!list) return;
 
-  list.classList.add("show");
+  clearPoiMarkers();
   list.innerHTML = `<li class="text-muted">Loading...</li>`;
 
   try {
     const { places } = await google.maps.places.Place.searchNearby({
       locationRestriction: { center: { lat, lng }, radius: 3000 },
       includedTypes: [type],
-      maxResultCount: 5,
-      fields: ["displayName", "rating", "photos", "location"],
+      maxResultCount: 6,
+      fields: ["displayName", "rating", "photos", "location"]
     });
 
     list.innerHTML = "";
 
-    if (!places || !places.length) {
-      list.innerHTML = `<li>No places found</li>`;
+    if (!places?.length) {
+      list.innerHTML = `<li class="text-muted">No places found</li>`;
       return;
     }
 
-    places.forEach(place => {
+    places.forEach((place, index) => {
       const photoUrl = place.photos?.length
-        ? place.photos[0].getURI({ maxWidth: 200, maxHeight: 150 })
+        ? place.photos[0].getURI({ maxWidth: 240, maxHeight: 180 })
         : null;
 
       const li = document.createElement("li");
       li.className = "mb-2";
 
       li.innerHTML = `
-        <div class="poi-card d-flex gap-2 p-2 border rounded">
+        <div class="poi-card">
           ${photoUrl ? `<img src="${photoUrl}" class="poi-photo" alt="${place.displayName}">` : ""}
-          <div>
-            <div class="d-flex justify-content-between gap-2">
-              <strong>${place.displayName}</strong>
-              ${place.rating ? `<span>⭐ ${place.rating}</span>` : ""}
+          <div class="w-100">
+            <div class="poi-header">
+              <span class="poi-name">${index + 1}. ${place.displayName}</span>
+              ${place.rating ? `<span class="poi-rating">⭐ ${place.rating}</span>` : ""}
             </div>
-            <small class="text-muted">${formatType(type)}</small>
+            <div class="poi-type">${formatType(type)}</div>
           </div>
         </div>
       `;
 
+      // clicking POI pans map
+      li.addEventListener("click", () => {
+        if (place.location) {
+          map.panTo(place.location);
+          map.setZoom(15);
+        }
+      });
+
       list.appendChild(li);
+
+      // marker
+      if (place.location) {
+        const marker = new google.maps.Marker({
+          map,
+          position: place.location,
+          title: place.displayName,
+          label: `${index + 1}`
+        });
+        poiMarkers.push(marker);
+      }
     });
 
   } catch (err) {
-    console.error(err);
-    list.innerHTML = `<li>Error loading places</li>`;
+    console.error("Places error:", err);
+    list.innerHTML = `<li class="text-danger">Error loading places</li>`;
   }
 }
 
-/* ===============================
-   BUTTONS (pass button, find card)
-================================ */
+function clearPoiMarkers() {
+  poiMarkers.forEach(m => m.setMap(null));
+  poiMarkers = [];
+}
+
+// ---------- CITY CARD IMAGES ----------
+async function hydrateCityImages() {
+  const cards = document.querySelectorAll(".place-card");
+
+  for (const card of cards) {
+    const lat = parseFloat(card.dataset.lat);
+    const lng = parseFloat(card.dataset.lng);
+
+    // only targets <img class="place-photo"> (your placeholders)
+    const img = card.querySelector("img.place-photo");
+    if (!img || !lat || !lng) continue;
+
+    // Only fill if no src already (keeps local photos like vienna.jpg)
+    if (img.getAttribute("src")) continue;
+
+    // nice default placeholder while loading
+    img.src =
+      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='350'%3E%3Crect width='100%25' height='100%25' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-size='22'%3ELoading photo...%3C/text%3E%3C/svg%3E";
+
+    try {
+      const { places } = await google.maps.places.Place.searchNearby({
+        locationRestriction: { center: { lat, lng }, radius: 5000 },
+        includedTypes: ["tourist_attraction"],
+        maxResultCount: 1,
+        fields: ["photos"]
+      });
+
+      const photo = places?.[0]?.photos?.[0];
+      if (!photo) continue;
+
+      img.src = photo.getURI({ maxWidth: 800, maxHeight: 480 });
+    } catch (err) {
+      console.warn("City image failed:", card.dataset.city, err);
+    }
+  }
+}
+
+// ---------- BUTTONS (your inline onclick uses these) ----------
 window.showAttractions = (btn) => openCard(btn.closest(".place-card"), "tourist_attraction");
 window.showRestaurants = (btn) => openCard(btn.closest(".place-card"), "restaurant");
 window.showHotels = (btn) => openCard(btn.closest(".place-card"), "lodging");
 
-/* ===============================
-   LABELS
-================================ */
+// ---------- LABELS ----------
 function formatType(type) {
   if (type === "restaurant") return "🍽 Restaurant";
   if (type === "lodging") return "🏨 Hotel";
@@ -172,8 +236,8 @@ function formatType(type) {
 }
 
 
-
 </script>
+
 
 </head>
 <body>
@@ -205,7 +269,7 @@ function formatType(type) {
   <div class="row g-4 mb-5">
     <div class="col-md-4">
      <div class="place-card" data-city="paris" data-lat="48.8566" data-lng="2.3522">
-  <img src="images/paris.jpg" alt="Paris">
+  <img class="place-photo" alt="City photo" />
   <div>
     <h6>Paris</h6>
     <small>Paris, France</small>
@@ -235,11 +299,10 @@ function formatType(type) {
             data-city="vienna"
             data-lat="48.2082"
             data-lng="16.3738">
-        <img src="images/vienna.jpg" alt="Vienna">
         <div>
+        <img class="place-photo" alt="City photo" />
           <h6>Vienna</h6>
           <small>Vienna, Austria</small>
-
            <ul class="poi-results list-unstyled mt-2 collapse"></ul>
         </div>
 
@@ -267,7 +330,7 @@ function formatType(type) {
             data-city="copenhagen"
             data-lat="55.6761"
             data-lng="12.5683">
-        <img src="images/copenhagen.jpg" alt="Copenhagen">
+ <img class="place-photo" alt="City photo" />
         <div>
           <h6>Copenhagen</h6>
           <small>Copenhagen, Denmark</small>
@@ -299,7 +362,8 @@ function formatType(type) {
             data-city="london"
             data-lat="51.5074"
             data-lng="-0.1278">
-        <img src="images/london.jpg" alt="London">
+   <img class="place-photo" alt="City photo" />
+
         <div>
           <h6>London</h6>
           <small>London, UK</small>
@@ -329,7 +393,8 @@ function formatType(type) {
             data-city="prague"
             data-lat="50.0755"
             data-lng="14.4378">
-        <img src="images/prague.jpg" alt="Prague">
+<img class="place-photo" alt="City photo" />
+
         <div>
           <h6>Prague</h6>
           <small>Prague, Czechia</small>
@@ -359,7 +424,8 @@ function formatType(type) {
             data-city="warsaw"
             data-lat="52.2297"
             data-lng="21.0122">
-        <img src="images/warsaw.jpg" alt="Warsaw">
+     <img class="place-photo" alt="City photo" />
+
         <div>
           <h6>Warsaw</h6>
           <small>Warsaw, Poland</small>
@@ -392,7 +458,8 @@ function formatType(type) {
             data-city="berlin"
             data-lat="52.5200"
             data-lng="13.4050">
-        <img src="images/berlin.jpg" alt="Berlin">
+  <img class="place-photo" alt="City photo" />
+
         <div>
           <h6>Berlin</h6>
           <small>Berlin, Germany</small>
@@ -422,7 +489,8 @@ function formatType(type) {
             data-city="madrid"
             data-lat="40.168"
             data-lng="-3.7038">
-        <img src="images/madrid.jpg" alt="Madrid">
+   <img class="place-photo" alt="City photo" />
+
         <div>
           <h6>Madrid</h6>
           <small>Madrid, Spain</small>
@@ -453,7 +521,8 @@ function formatType(type) {
             data-city="lisbon"
             data-lat="38.7223"
             data-lng="-9.1393">
-        <img src="images/lisbon.jpg" alt="Lisbon">
+    <img class="place-photo" alt="City photo" />
+
         <div>
           <h6>Lisbon</h6>
           <small>Lisbon, Portugal</small>

@@ -45,18 +45,25 @@
         Search for your perfect holiday
       </h1>
 
-      <form id="searchForm" class="row g-3 align-items-end">
+     <form id="searchForm" class="row g-3">
 
-        <div class="col-lg-3 col-md-6">
-          <input
-            type="date"
-            id="dates"
-            class="form-control search-input"
-            required
-          >
-        </div>
 
-     <div class="col-lg-3 col-md-6">
+
+  <!-- Hidden inputs to store guest counts -->
+<input type="hidden" id="adultsCount" value="1">
+<input type="hidden" id="childrenCount" value="0">
+<input type="hidden" id="toddlersCount" value="0">
+<input type="hidden" id="babiesCount" value="0">
+
+  <!-- ROW 1 -->
+  <div class="row g-3">
+    <!-- Date -->
+    <div class="col-lg-3 col-md-6">
+      <input type="date" id="dates" class="form-control search-input" required>
+    </div>
+
+    <!-- Destination -->
+    <div class="col-lg-3 col-md-6">
       <select id="destination" class="form-select search-input" required>
         <option value="">Select a city</option>
         <option value="paris">Paris</option>
@@ -71,59 +78,100 @@
       </select>
     </div>
 
+   <!-- Guests dropdown (single) -->
+<div class="col-lg-6 col-md-12">
+  <div class="dropdown w-100">
+    <button
+      class="btn dropdown-toggle people-btn w-100"
+      type="button"
+      id="guestsDropdownBtn"
+      data-bs-toggle="dropdown"
+      aria-expanded="false">
+      Guests: 1
+    </button>
 
-
-      <div class="col-lg-3 col-md-6">
-        <select id="adults" class="form-select search-input" required>
-          <option value="0">Adults</option>
-          <option value="1">1 Adult</option>
-          <option value="2">2 Adults</option>
-          <option value="3">3 Adults</option>
-          <option value="4">4 Adults</option>
-          <option value="5">5 Adults</option>
-       </select>
+    <div class="dropdown-menu w-100 p-3 guests-menu" aria-labelledby="guestsDropdownBtn">
+      <!-- Adults -->
+      <div class="d-flex align-items-center justify-content-between py-2">
+        <div>
+          <div class="fw-semibold">Adults</div>
+          <small class="text-muted">18+</small>
+        </div>
+        <div class="guest-stepper" data-type="adults">
+          <button type="button" class="btn btn-sm step-btn" data-action="minus">−</button>
+          <span class="guest-count" id="adultsDisplay">1</span>
+          <button type="button" class="btn btn-sm step-btn" data-action="plus">+</button>
+        </div>
       </div>
 
-      <div class="col-lg-3 col-md-6">
-  <select id="children" class="form-select search-input" required>
-    <option value="0">Children</option>
-    <option value="1">1 Child</option>
-    <option value="2">2 Children</option>
-    <option value="3">3 Children</option>
-    <option value="4">4 Children</option>
-    <option value="5">5 Children</option>
-  </select>
-</div>
+      <hr class="my-2">
 
-<div class="col-lg-3 col-md-6">
-  <select id="Toddler" class="form-select search-input" required>
-    <option value="0">Toddlers (3-5)</option>
-    <option value="1">1 Toddler</option>
-    <option value="2">2 Toddlers</option>
-    <option value="3">3 Toddlers</option>
-    <option value="4">4 Toddlers</option>
-    <option value="5">5 Toddlers</option>
-  </select>
-</div>
-
-<div class="col-lg-3 col-md-6">
-  <select id="babies" class="form-select search-input" required>
-    <option value="0">Babies (0-3)</option>
-    <option value="1">1 Baby</option>
-    <option value="2">2 Babies</option>
-    <option value="3">3 Babies</option>
-    <option value="4">4 Babies</option>
-    <option value="5">5 Babies</option>
-  </select>
-</div>
-
-        <div class="col-lg-3 col-md-6 d-grid">
-          <button type="submit" class="btn search-btn btn-danger">
-            Search for your holiday
-          </button>
+      <!-- Children -->
+      <div class="d-flex align-items-center justify-content-between py-2">
+        <div>
+          <div class="fw-semibold"> attaching
+          </div>
+          <small class="text-muted">5–17</small>
         </div>
+        <div class="guest-stepper" data-type="children">
+          <button type="button" class="btn btn-sm step-btn" data-action="minus">−</button>
+          <span class="guest-count" id="childrenDisplay">0</span>
+          <button type="button" class="btn btn-sm step-btn" data-action="plus">+</button>
+        </div>
+      </div>
 
-      </form>
+      <hr class="my-2">
+
+      <!-- Toddlers -->
+      <div class="d-flex align-items-center justify-content-between py-2">
+        <div>
+          <div class="fw-semibold">Toddlers</div>
+          <small class="text-muted">3–5</small>
+        </div>
+        <div class="guest-stepper" data-type="toddlers">
+          <button type="button" class="btn btn-sm step-btn" data-action="minus">−</button>
+          <span class="guest-count" id="toddlersDisplay">0</span>
+          <button type="button" class="btn btn-sm step-btn" data-action="plus">+</button>
+        </div>
+      </div>
+
+      <hr class="my-2">
+
+      <!-- Babies -->
+      <div class="d-flex align-items-center justify-content-between py-2">
+        <div>
+          <div class="fw-semibold">Babies</div>
+          <small class="text-muted">0–3</small>
+        </div>
+        <div class="guest-stepper" data-type="babies">
+          <button type="button" class="btn btn-sm step-btn" data-action="minus">−</button>
+          <span class="guest-count" id="babiesDisplay">0</span>
+          <button type="button" class="btn btn-sm step-btn" data-action="plus">+</button>
+        </div>
+      </div>
+
+      <div class="alert alert-warning py-2 px-2 mt-3 d-none" id="adultWarning">
+        At least 1 adult is required to search.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+    <!-- Search button -->
+    <div class="col-lg-6 col-md-12 d-grid">
+      <button type="submit" class="btn search-btn btn-danger">
+        Search for your holiday
+      </button>
+    </div>
+  </div>
+
+<p id="guestSummary" class="mt-3 text-white fw-medium">
+  Guests: 1 adult · 0 children · 0 toddlers · 0 babies
+</p>
+
+</form>
+
     </div>
   </div>
 </section>
