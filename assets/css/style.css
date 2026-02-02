@@ -43,6 +43,22 @@ body{
   font-weight: 500;
 }
 
+.guests-menu .step-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: #fff;
+}
+
+.guests-menu .guest-count {
+  width: 28px;
+  text-align: center;
+  display: inline-block;
+  font-weight: 600;
+}
+
+
 .search-btn:hover {
   background-color: #e94f4f;
   color: #fff;

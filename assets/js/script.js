@@ -395,6 +395,13 @@ document.querySelectorAll(".guest-stepper").forEach(stepper => {
       state.babies = 0;
     }
 
+    document.addEventListener("click", (e) => {
+  if (e.target.closest(".guests-menu")) {
+    e.stopPropagation();
+  }
+});
+
+
     updateUI();
   });
 });
