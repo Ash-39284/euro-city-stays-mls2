@@ -30,44 +30,72 @@ async function initMap() {
     center: { lat: 50.8503, lng: 4.3517 },
     zoom: 5,
   });
+
+  attachCardClickHandlers();
+  autoOpenCityFromSearch();
 }
 
-window.addEventListener("load", initMap);
-
 /* ===============================
-   BUTTON HANDLERS
+   AUTO-OPEN CITY FROM URL
 ================================ */
-function showAttractions(btn) {
-  handleCategoryClick(btn, "tourist_attraction");
-}
+function autoOpenCityFromSearch() {
+  const params = new URLSearchParams(window.location.search);
+  const city = params.get("city");
+  if (!city) return;
 
-function showRestaurants(btn) {
-  handleCategoryClick(btn, "restaurant");
-}
+  const card = document.querySelector(
+    `.place-card[data-city="${city.toLowerCase()}"]`
+  );
 
-function showHotels(btn) {
-  handleCategoryClick(btn, "lodging");
-}
+  if (!card) return;
 
-function handleCategoryClick(button, type) {
-  const card = button.closest(".place-card");
-  fetchPOIs(card, type);
-
-  const lat = parseFloat(card.dataset.lat);
-  const lng = parseFloat(card.dataset.lng);
-  map.panTo({ lat, lng });
-  map.setZoom(11);
+  card.scrollIntoView({ behavior: "smooth", block: "center" });
+  card.click(); // triggers everything below
 }
 
 /* ===============================
-   FETCH PLACES
+   CARD CLICK HANDLING
+================================ */
+function attachCardClickHandlers() {
+  document.querySelectorAll(".place-card").forEach(card => {
+    card.addEventListener("click", async () => {
+      collapseAllCards(card);
+
+      const lat = parseFloat(card.dataset.lat);
+      const lng = parseFloat(card.dataset.lng);
+
+      map.panTo({ lat, lng });
+      map.setZoom(11);
+
+      await fetchPOIs(card, "tourist_attraction");
+    });
+  });
+}
+
+/* ===============================
+   COLLAPSE OTHER CARDS
+================================ */
+function collapseAllCards(activeCard) {
+  document.querySelectorAll(".poi-results").forEach(list => {
+    if (!activeCard.contains(list)) {
+      list.classList.remove("show");
+      list.innerHTML = "";
+    }
+  });
+
+  const activeList = activeCard.querySelector(".poi-results");
+  if (activeList) activeList.classList.add("show");
+}
+
+/* ===============================
+   FETCH POIs
 ================================ */
 async function fetchPOIs(card, type) {
   const lat = parseFloat(card.dataset.lat);
   const lng = parseFloat(card.dataset.lng);
   const list = card.querySelector(".poi-results");
 
-  list.innerHTML = "<li>Loading places...</li>";
+  list.innerHTML = `<li class="text-muted">Loading...</li>`;
 
   try {
     const { places } = await google.maps.places.Place.searchNearby({
@@ -82,77 +110,42 @@ async function fetchPOIs(card, type) {
 
     list.innerHTML = "";
 
-    if (!places || places.length === 0) {
-      list.innerHTML = "<li>No results found</li>";
+    if (!places.length) {
+      list.innerHTML = `<li>No places found</li>`;
       return;
     }
 
     places.forEach(place => {
-  const li = document.createElement("li");
+      const li = document.createElement("li");
+      li.className = "poi-card mb-2";
 
-  const photoUrl = place.photos?.length
-    ? place.photos[0].getURI({ maxWidth: 200, maxHeight: 150 })
-    : null;
-
-  li.innerHTML = `
-    <div class="poi-card d-flex gap-2">
-      ${photoUrl ? `<img src="${photoUrl}" class="poi-photo">` : ""}
-      <div>
-        <div class="poi-header">
-          <span class="poi-name">${place.displayName}</span>
-          ${place.rating ? `<span class="poi-rating">⭐ ${place.rating}</span>` : ""}
+      li.innerHTML = `
+        <div class="p-2 border rounded">
+          <strong>${place.displayName}</strong>
+          ${place.rating ? `<span class="ms-2">⭐ ${place.rating}</span>` : ""}
         </div>
-        <div class="poi-type">${formatType(type)}</div>
-      </div>
-    </div>
-  `;
+      `;
 
-  list.appendChild(li);
-});
-
+      list.appendChild(li);
+    });
 
   } catch (err) {
     console.error(err);
-    list.innerHTML = "<li>Error loading places</li>";
+    list.innerHTML = `<li>Error loading places</li>`;
   }
 }
 
 /* ===============================
-   LABELS
+   OPTIONAL BUTTON SUPPORT
 ================================ */
-function formatType(type) {
-  if (type === "restaurant") return "🍽 Restaurant";
-  if (type === "lodging") return "🏨 Hotel";
-  return "📍 Attraction";
-}
+window.showAttractions = card => fetchPOIs(card, "tourist_attraction");
+window.showRestaurants = card => fetchPOIs(card, "restaurant");
+window.showHotels = card => fetchPOIs(card, "lodging");
 
-
-/*================================
-DESTINATIONS CARDS STYLING
-======================== */
-function collapseAllExcept(activeCard) {
-  document.querySelectorAll(".poi-results").forEach(list => {
-    if (!activeCard.contains(list)) {
-      list.innerHTML = "";
-    }
-  });
-};
-
-
-function handleCategoryClick(button, type) {
-  const card = button.closest(".place-card");
-
-  collapseAllExcept(card);
-  fetchPOIs(card, type);
-
-  const lat = parseFloat(card.dataset.lat);
-  const lng = parseFloat(card.dataset.lng);
-  map.panTo({ lat, lng });
-  map.setZoom(11);
-};
-
-
-
+/* ===============================
+   BOOTSTRAP MAP LOAD
+================================ */
+window.addEventListener("load", initMap);
 
 
 </script>
@@ -191,6 +184,8 @@ function handleCategoryClick(button, type) {
   <div>
     <h6>Paris</h6>
     <small>Paris, France</small>
+
+     <ul class="poi-results list-unstyled mt-2 collapse"></ul>
   </div>
 
    <div class="d-flex gap-2 mt-2">
@@ -212,8 +207,6 @@ function handleCategoryClick(button, type) {
 </div>
 </div>
 
-
-
     <div class="col-md-4">
       <div class="place-card" 
             data-city="vienna"
@@ -223,6 +216,8 @@ function handleCategoryClick(button, type) {
         <div>
           <h6>Vienna</h6>
           <small>Vienna, Austria</small>
+
+           <ul class="poi-results list-unstyled mt-2 collapse"></ul>
         </div>
 
          <div class="d-flex gap-2 mt-2">
@@ -253,6 +248,8 @@ function handleCategoryClick(button, type) {
         <div>
           <h6>Copenhagen</h6>
           <small>Copenhagen, Denmark</small>
+
+           <ul class="poi-results list-unstyled mt-2 collapse"></ul>
         </div>
 
          <div class="d-flex gap-2 mt-2">
@@ -285,6 +282,8 @@ function handleCategoryClick(button, type) {
         <div>
           <h6>London</h6>
           <small>London, UK</small>
+
+           <ul class="poi-results list-unstyled mt-2 collapse"></ul>
         </div>
 
          <div class="d-flex gap-2 mt-2">
@@ -315,6 +314,8 @@ function handleCategoryClick(button, type) {
         <div>
           <h6>Prague</h6>
           <small>Prague, Czechia</small>
+
+           <ul class="poi-results list-unstyled mt-2 collapse"></ul>
         </div>
 
  <div class="d-flex gap-2 mt-2">
@@ -345,6 +346,8 @@ function handleCategoryClick(button, type) {
         <div>
           <h6>Warsaw</h6>
           <small>Warsaw, Poland</small>
+
+           <ul class="poi-results list-unstyled mt-2 collapse"></ul>
         </div>
         
          <div class="d-flex gap-2 mt-2">
@@ -378,6 +381,8 @@ function handleCategoryClick(button, type) {
         <div>
           <h6>Berlin</h6>
           <small>Berlin, Germany</small>
+
+           <ul class="poi-results list-unstyled mt-2 collapse"></ul>
         </div>
 
          <div class="d-flex gap-2 mt-2">
@@ -408,6 +413,8 @@ function handleCategoryClick(button, type) {
         <div>
           <h6>Madrid</h6>
           <small>Madrid, Spain</small>
+
+           <ul class="poi-results list-unstyled mt-2 collapse"></ul>
         </div>
 
 
@@ -439,6 +446,8 @@ function handleCategoryClick(button, type) {
         <div>
           <h6>Lisbon</h6>
           <small>Lisbon, Portugal</small>
+
+           <ul class="poi-results list-unstyled mt-2 collapse"></ul>
         </div>
 
 

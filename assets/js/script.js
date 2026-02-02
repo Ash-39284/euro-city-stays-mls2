@@ -2,38 +2,44 @@
 // AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I
 
 // Search feature (only on HTML)
-if (document.getElementById("searchForm")) {
-  $('#searchForm').on('submit', function (e) {
+
+const ALLOWED_CITIES = [
+  "paris",
+  "vienna",
+  "copenhagen",
+  "london",
+  "prague",
+  "warsaw",
+  "berlin",
+  "madrid",
+  "lisbon"
+];
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("searchForm");
+  if (!form) return;
+
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    const destination = $('#destination').val().trim().toLowerCase();
-    if (!destination) return alert("Please enter a destination");
+    const city = document
+      .getElementById("destination")
+      .value
+      .trim()
+      .toLowerCase();
+
+    if (!city) {
+      alert("Please enter a city");
+      return;
+    }
+
+    if (!ALLOWED_CITIES.includes(city)) {
+      alert("This destination is not available yet.");
+      return;
+    }
 
     window.location.href =
-      `destinations.html?city=${encodeURIComponent(destination)}`;
+      `destinations.html?city=${encodeURIComponent(city)}`;
   });
-};
-
-window.addEventListener("load", () => {
-  const params = new URLSearchParams(window.location.search);
-  const city = params.get("city");
-
-  if (!city) return;
-
-  const card = document.querySelector(
-    `.place-card[data-city="${city.toLowerCase()}"]`
-  );
-
-  if (card) {
-    card.scrollIntoView({ behavior: "smooth", block: "center" });
-    fetchPOIs(card, "tourist_attraction");
-
-    const lat = parseFloat(card.dataset.lat);
-    const lng = parseFloat(card.dataset.lng);
-    map.panTo({ lat, lng });
-    map.setZoom(11);
-  }
 });
-
-
 
