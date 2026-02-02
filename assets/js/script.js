@@ -383,12 +383,12 @@ document.querySelectorAll(".guest-stepper").forEach(stepper => {
       state[type]--;
     }
 
-    // If adults drop to 0 (failsafe)
+    // If adults drop to 0 
     if (state.adults < 1) {
       state.adults = 1;
     }
 
-    // Reset kids if adults = 0 (extra safety)
+    // Reset kids if adults = 0 
     if (state.adults === 0) {
       state.children = 0;
       state.toddlers = 0;
@@ -400,7 +400,6 @@ document.querySelectorAll(".guest-stepper").forEach(stepper => {
     e.stopPropagation();
   }
 });
-
 
     updateUI();
   });

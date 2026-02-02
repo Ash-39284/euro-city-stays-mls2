@@ -43,6 +43,10 @@ body{
   font-weight: 500;
 }
 
+#guestsDropdownBtn{
+    border: solid 1px #000;
+}
+
 .guests-menu .step-btn {
   width: 32px;
   height: 32px;
