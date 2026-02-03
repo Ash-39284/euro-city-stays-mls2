@@ -47,7 +47,71 @@
   </div>
 </section>
 
+<!-- MAIN -->
+<section class="container mb-5">
+  <div class="row g-4">
 
+    <!-- LEFT: PACKAGE DETAILS -->
+    <div class="col-lg-7">
+
+      <!-- Dates + Guests -->
+      <div class="card p-4 mb-4">
+        <h5 class="mb-3">Trip details</h5>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Check-in</label>
+            <input type="date" class="form-control" id="checkIn" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Check-out</label>
+            <input type="date" class="form-control" id="checkOut" required />
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Guests</label>
+            <div class="d-flex flex-wrap gap-2">
+              <select class="form-select w-auto" id="adults" required>
+                <option value="1" selected>Adults: 1</option>
+                <option value="2">Adults: 2</option>
+                <option value="3">Adults: 3</option>
+                <option value="4">Adults: 4</option>
+                <option value="5">Adults: 5</option>
+              </select>
+
+              <select class="form-select w-auto" id="children">
+                <option value="0" selected>Children: 0</option>
+                <option value="1">Children: 1</option>
+                <option value="2">Children: 2</option>
+                <option value="3">Children: 3</option>
+                <option value="4">Children: 4</option>
+              </select>
+            
+
+             <select class="form-select w-auto" id="toddlers">
+                <option value="0" selected>Toddlers: 0</option>
+                <option value="1">Toddlers: 1</option>
+                <option value="2">Toddlers: 2</option>
+                <option value="3">Toddlers: 3</option>
+                <option value="4">Toddlers: 4</option>
+              </select>
+            
+
+             <select class="form-select w-auto" id="babies">
+                <option value="0" selected>Babies: 0</option>
+                <option value="1">Babies: 1</option>
+                <option value="2">Babies: 2</option>
+                <option value="3">Babies: 3</option>
+                <option value="4">Babies: 4</option>
+              </select>
+            </div>
+
+            <small class="text-muted d-block mt-2">
+              At least 1 adult is required.
+            </small>
+          </div>
+        </div>
+      </div>
 
 
 
@@ -63,6 +127,6 @@
 
 <!-- Bootstrap script -->
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
- 
+
 </body>
 </html>
