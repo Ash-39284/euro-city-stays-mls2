@@ -253,6 +253,27 @@ body{
   cursor: not-allowed;
 }
 
+.package-hero {
+  background: linear-gradient(135deg, #ff7a7a, #ffa640);
+  border-radius: 28px;
+}
+
+.package-badge {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.package-image {
+  height: 220px;
+  width: 100%;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
 
 /* mobile media query */
 @media (max-width: 768px) {

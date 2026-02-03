@@ -1,69 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOOK NOW!</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Now - Euro City Stays</title>
 
-    <!-- css stylesheet -->
-    <link rel="stylesheet" href="./assets/css/style.css">
- 
-    <!-- Bootstrap link -->
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="./assets/css/style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
 
-
-    </head>
-        <body>
-
-<!-- Navbar section -->
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-sky shadow-sm">
   <div class="container">
     <a class="navbar-brand fw-bold text-warning" href="index.html">Euro City Stays</a>
-
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
       <span class="navbar-toggler-icon"></span>
     </button>
-
     <div class="collapse navbar-collapse justify-content-end" id="mainNav">
       <ul class="navbar-nav">
         <li class="nav-item"><a class="nav-link text-warning" href="index.html">Home</a></li>
-        <li class="nav-item"><a class="nav-link text-warning active" href="destinations.html">Destinations</a></li>
+        <li class="nav-item"><a class="nav-link text-warning" href="destinations.html">Destinations</a></li>
         <li class="nav-item">
-          <a class="nav-link btn btn-warning text-dark px-3 ms-lg-2" href="book.html">BOOK NOW!</a>
+          <a class="nav-link btn btn-warning text-dark px-3 ms-lg-2 active" href="book.html">BOOK NOW!</a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
 
+<!-- PACKAGE HEADER -->
+<section class="container my-5">
+  <div class="package-hero p-4 p-lg-5">
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-7">
+        <h1 class="mb-2 text-white fw-semibold">Paris City Package</h1>
+        <p class="text-white-50 mb-3">
+          A simple city-break bundle with hotel + attractions + local food picks.
+        </p>
 
-
-
-
-<!-- Footer section -->
-<footer class="footer bg-danger text-light py-3">
-  <div class="container d-flex justify-content-between align-items-center flex-wrap">
-    <small>Copyright © 2026 Ashley Roberts. All rights reserved.</small>
-    <strong>Euro City Stays</strong>
+      <div class="col-lg-5">
+        <div class="package-image rounded-4"></div>
+      </div>
+    </div>
   </div>
-</footer>
+</section>
 
-
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-<!-- Google Maps + Places -->
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I&libraries=places&v=beta"
-  async
-  defer>
-</script>
-
-<!-- Your JS -->
-<script src="./assets/js/script.js"></script>
-
-<!-- Bootstrap script -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    
-    </body>
+</body>
 </html>
