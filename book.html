@@ -197,9 +197,53 @@
 
     </div>
 
+<!--Booking summary-->
+    <div class="col-lg-5">
+      <div class="card p-4 booking-summary sticky-top">
+        <h5 class="mb-3">Booking summary</h5>
+
+        <div class="summary-row">
+          <span>Destination</span>
+          <strong id="summaryCity">Paris</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Dates</span>
+          <strong id="summaryDates">Select dates</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Guests</span>
+          <strong id="summaryGuests">1 adult</strong>
+        </div>
+
+        <hr />
+
+        <div class="summary-row">
+          <span>Package</span>
+          <strong id="summaryTier">Basic</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Price</span>
+          <strong id="summaryPrice">£149</strong>
+        </div>
+
+        <button class="btn btn-danger w-100 mt-3" id="confirmBtn">
+          Confirm & Continue
+        </button>
+
+        <small class="text-muted d-block mt-2 text-center">
+          No payment required yet (demo checkout).
+        </small>
+      </div>
+    </div>
+
+  </div>
 
 
 
+</section>
 
 <!-- Footer -->
 <footer class="footer bg-danger text-light py-3">
@@ -211,6 +255,63 @@
 
 <!-- Bootstrap script -->
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<!-- JS to update summary -->
+ <script>
+    const checkIn = document.getElementById("checkIn");
+    const checkOut = document.getElementbyId("checkOut");
+    const adults = document.getElementById("adult");
+    const children = document.getElementById("children");
+
+    const summaryDates = document.getElementById("summaryDates");
+    const summaryGuests = document.getElementById("summaryGuests");
+    const summaryTier = document.getElemetById("summaryTier");
+    const summaryPrice = document.getElementById("summaryPrice");
+
+    const prices = {basic: 149, plus: 199, premium: 249};
+
+    function updateDates() {
+        if (checkIn.value && checkOut.value) {
+            summaryDates.textContent = `${checkIn.value} => ${checkOut.value}`;
+        } else {
+            summaryDates.textContent = "Select Dates";
+        }
+    }
+
+    function updateGuests () {
+        const a = parseInt(adults.value, 10);
+        const c = parseInt(children.value, 10);
+
+        // if adults comes back to 0, this ensures it goes back to 1
+
+        if (a < 1) {
+            adults.value = "1"
+        }
+
+        let text = `${adults.value} adult${adults.value > 1 ? "s" : ""}`;
+        if (c > 0) text += ` · ${children.value} child${c > 1 ? "ren" : ""}`;
+        summaryGuests.textContent = text; 
+    }
+
+    function updateTier() {
+        const selected = document.querySelector('input[name="tier"]:checked').value;
+        summaryTier.textContent = selected.charAt(0).toUpperCase() + selected.slice(1);
+        summaryPrice.textContent = `£${prices[selected]}`;
+    }
+
+    [checkIn, checkOut].forEach (el => el.addEventListener("change", updateDates));
+    [adults, children].forEach (el => el.addEventListener("change", updateGuests));
+    document.querySelectorAll('input[name="tier"]').forEach(r => r.addEventListener("change", updateTier));
+
+    updateDates();
+    updateGuests();
+    updateTier();
+
+
+ </script>
+
+
 
 </body>
 </html>
