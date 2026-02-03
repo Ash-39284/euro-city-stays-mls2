@@ -27,7 +27,6 @@ async function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 50.8503, lng: 4.3517 },
     zoom: 5,
-    mapId: "DEMO_MAP_ID", // optional; remove if you don't use a Map ID
   });
 
   attachCardClickHandlers();

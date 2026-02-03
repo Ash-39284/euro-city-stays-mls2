@@ -38,6 +38,21 @@ The primary goal of this project is to allow users to have aa simple yet streaml
 
 ## User Goals
 
+## User Stories
+
+## Developer Goals
+
+## Design Choices
+
+# Features
+
+## Existing Features
+
+## Features To Implement
+
+# Technologies Used
+
+# Testing
 
 # Bugs discovered
 
@@ -63,11 +78,25 @@ The second bug I encountered was when I connected the cards to the google maps A
 
 The code issue was that I put in the `data-lng` class in incorrect. This was the issue code:
 
-`data-lng="'12.5683"`
+`data-lang="'12.5683"`
 
 This is the code that fixed the error:
 
 `data-lng="12.5683"`
+
+# Deployment 
+
+## How To Run The Project Locally
+
+# Credits
+
+## Content
+
+## Code 
+
+## Images
+
+## Acknowledgements
 
 
 

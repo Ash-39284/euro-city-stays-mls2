@@ -22,31 +22,6 @@ let map;
 let poiMarkers = [];
 let activeCollapse = null;
 
-// ---------- BOOT ----------
-window.addEventListener("load", async () => {
-  if (!window.google?.maps) {
-    console.error("Google Maps did not load.");
-    return;
-  }
-
-  await initMap();
-});
-
-// ---------- INIT MAP ----------
-async function initMap() {
-  await google.maps.importLibrary("maps");
-  await google.maps.importLibrary("places");
-
-  map = new google.maps.Map(document.getElementById("map"), {
-    center: { lat: 50.8503, lng: 4.3517 },
-    zoom: 5
-  });
-
-  attachCardClickHandlers();
-  await hydrateCityImages();      // loads images for .place-photo
-  autoOpenCityFromSearch();       // open city from ?city=paris
-}
-
 // ---------- CARD CLICK ----------
 function attachCardClickHandlers() {
   document.querySelectorAll(".place-card").forEach(card => {
@@ -223,7 +198,7 @@ async function hydrateCityImages() {
   }
 }
 
-// ---------- BUTTONS (your inline onclick uses these) ----------
+// ---------- BUTTONS ----------
 window.showAttractions = (btn) => openCard(btn.closest(".place-card"), "tourist_attraction");
 window.showRestaurants = (btn) => openCard(btn.closest(".place-card"), "restaurant");
 window.showHotels = (btn) => openCard(btn.closest(".place-card"), "lodging");
