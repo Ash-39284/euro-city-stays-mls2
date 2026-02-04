@@ -1,45 +1,76 @@
 // google maps API key
 // AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I
 
-// Search feature (only on HTML)
-
 let map;
 let poiMarkers = [];
 
 /* ===============================
-   BOOT
+   BOOT (runs on ALL pages safely)
 ================================ */
 window.addEventListener("load", async () => {
-  if (!window.google?.maps) {
-    console.error("Google Maps did not load.");
-    return;
+  // Home/search submit setup
+  setupSearchRedirect();
+
+  // Guests dropdown setup (home page)
+  setupGuestsDropdown();
+
+  // Destinations map setup
+  if (window.google?.maps && document.getElementById("map")) {
+    await initMap();
   }
-  await initMap();
 });
 
 /* ===============================
-   INIT MAP
+   SEARCH REDIRECT (index.html)
+================================ */
+function setupSearchRedirect() {
+  const form = document.getElementById("searchForm");
+  if (!form) return;
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const city = document.getElementById("destination")?.value?.trim().toLowerCase();
+    const adults = parseInt(document.getElementById("adultsCount")?.value || "1", 10);
+
+    if (!city) return alert("Please select a city");
+    if (adults < 1) return alert("At least 1 adult is required");
+
+    window.location.href = `destinations.html?city=${encodeURIComponent(city)}`;
+  });
+}
+
+/* ===============================
+   INIT MAP (destinations.html only)
 ================================ */
 async function initMap() {
+  const mapEl = document.getElementById("map");
+  if (!mapEl) return;
+
   await google.maps.importLibrary("maps");
   await google.maps.importLibrary("places");
 
-  map = new google.maps.Map(document.getElementById("map"), {
+  map = new google.maps.Map(mapEl, {
     center: { lat: 50.8503, lng: 4.3517 },
     zoom: 5,
   });
 
   attachCardClickHandlers();
-  await hydrateCityImages();       // load city card images
-  autoOpenCityFromSearch();        // open city card from URL
+  await hydrateCityImages();
+  autoOpenCityFromSearch();
 }
 
 /* ===============================
    CARD CLICK HANDLING
 ================================ */
 function attachCardClickHandlers() {
-  document.querySelectorAll(".place-card").forEach(card => {
+  document.querySelectorAll(".place-card").forEach((card) => {
     card.addEventListener("click", () => openCard(card, "tourist_attraction"));
+  });
+
+  // Prevent card-click when pressing buttons inside the card
+  document.querySelectorAll(".place-card button").forEach((btn) => {
+    btn.addEventListener("click", (e) => e.stopPropagation());
   });
 }
 
@@ -78,7 +109,7 @@ async function openCard(card, type) {
    COLLAPSE OTHER CARDS
 ================================ */
 function collapseAllCards(activeCard) {
-  document.querySelectorAll(".place-card").forEach(card => {
+  document.querySelectorAll(".place-card").forEach((card) => {
     const list = card.querySelector(".poi-results");
     if (!list) return;
 
@@ -119,21 +150,23 @@ async function fetchPOIs(card, type) {
       return;
     }
 
-    places.forEach(place => {
+    const info = new google.maps.InfoWindow();
+    const bounds = new google.maps.LatLngBounds();
+
+    places.forEach((place, index) => {
       const photoUrl = place.photos?.length
         ? place.photos[0].getURI({ maxWidth: 220, maxHeight: 160 })
         : null;
 
-      // List item UI
+      // --- LIST UI ---
       const li = document.createElement("li");
       li.className = "mb-2";
-
       li.innerHTML = `
         <div class="poi-card">
           ${photoUrl ? `<img src="${photoUrl}" class="poi-photo" alt="${place.displayName}">` : ""}
           <div class="w-100">
             <div class="poi-header">
-              <span class="poi-name">${place.displayName}</span>
+              <span class="poi-name">${index + 1}. ${place.displayName}</span>
               ${place.rating ? `<span class="poi-rating">⭐ ${place.rating}</span>` : ""}
             </div>
             <div class="poi-type">${formatType(type)}</div>
@@ -141,91 +174,47 @@ async function fetchPOIs(card, type) {
         </div>
       `;
 
-      const info = new google.maps.InfoWindow();
-const bounds = new google.maps.LatLngBounds();
-
-places.forEach(place => {
-  const photoUrl = place.photos?.length
-    ? place.photos[0].getURI({ maxWidth: 220, maxHeight: 160 })
-    : null;
-
-  const li = document.createElement("li");
-  li.className = "mb-2";
-
-  li.innerHTML = `
-    <div class="poi-card">
-      ${photoUrl ? `<img src="${photoUrl}" class="poi-photo" alt="${place.displayName}">` : ""}
-      <div class="w-100">
-        <div class="poi-header">
-          <span class="poi-name">${place.displayName}</span>
-          ${place.rating ? `<span class="poi-rating">⭐ ${place.rating}</span>` : ""}
-        </div>
-        <div class="poi-type">${formatType(type)}</div>
-      </div>
-    </div>
-  `;
-
-  li.addEventListener("click", () => {
-    if (!place.location) return;
-    map.panTo(place.location);
-    map.setZoom(15);
-  });
-
-  list.appendChild(li);
-
-  if (place.location) {
-    bounds.extend(place.location);
-
-    const marker = new google.maps.Marker({
-      map,
-      position: place.location,
-      title: place.displayName,
-    });
-
-    marker.addListener("click", () => {
-      info.setContent(`
-        <div style="min-width:180px">
-          <strong>${place.displayName}</strong><br/>
-          ${place.rating ? `⭐ ${place.rating}` : "No rating"}<br/>
-          <small>${formatType(type)}</small>
-        </div>
-      `);
-      info.open({ map, anchor: marker });
-    });
-
-    poiMarkers.push(marker);
-  }
-});
-
-// Fit all POI markers nicely 
-if (poiMarkers.length >= 2) {
-  map.fitBounds(bounds);
-} else {
-  map.setZoom(13);
-}
-
-
-      // Click POI -> pan map to it
-      li.addEventListener("click", () => {
-        if (place.location) {
-          map.panTo(place.location);
-          map.setZoom(15);
-        }
+      li.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!place.location) return;
+        map.panTo(place.location);
+        map.setZoom(15);
       });
 
       list.appendChild(li);
 
-      // Map marker for POI
+      // --- MARKER ---
       if (place.location) {
+        bounds.extend(place.location);
+
         const marker = new google.maps.Marker({
           map,
           position: place.location,
           title: place.displayName,
+          label: `${index + 1}`,
         });
+
+        marker.addListener("click", () => {
+          info.setContent(`
+            <div style="min-width:180px">
+              <strong>${place.displayName}</strong><br/>
+              ${place.rating ? `⭐ ${place.rating}` : "No rating"}<br/>
+              <small>${formatType(type)}</small>
+            </div>
+          `);
+          info.open({ map, anchor: marker });
+        });
+
         poiMarkers.push(marker);
       }
     });
 
+    // Fit markers
+    if (poiMarkers.length >= 2) {
+      map.fitBounds(bounds);
+    } else {
+      map.setZoom(13);
+    }
   } catch (err) {
     console.error("Places error:", err);
     list.innerHTML = `<li class="text-danger">Error loading places</li>`;
@@ -233,13 +222,12 @@ if (poiMarkers.length >= 2) {
 }
 
 function clearPoiMarkers() {
-  poiMarkers.forEach(m => m.setMap(null));
+  poiMarkers.forEach((m) => m.setMap(null));
   poiMarkers = [];
 }
 
 /* ===============================
    CITY CARD IMAGES (Places Photos)
-   Uses nearby attractions to grab 1 nice photo
 ================================ */
 async function hydrateCityImages() {
   const cards = document.querySelectorAll(".place-card");
@@ -248,13 +236,10 @@ async function hydrateCityImages() {
     const lat = parseFloat(card.dataset.lat);
     const lng = parseFloat(card.dataset.lng);
 
-    // your card image (use .place-photo if present, otherwise first img)
-    const img = card.querySelector(".place-photo") || card.querySelector("img");
+    const img = card.querySelector("img.place-photo");
     if (!img || !lat || !lng) continue;
 
-    // Skip if you already have a local image and you DON'T want to replace it
-    // If you DO want to replace, remove this if block
-    if (img.getAttribute("src")) continue;
+    if (img.getAttribute("src")) continue; // keep existing images
 
     try {
       const { places } = await google.maps.places.Place.searchNearby({
@@ -275,7 +260,7 @@ async function hydrateCityImages() {
 }
 
 /* ===============================
-   BUTTONS (use the button to find card)
+   BUTTONS (destinations cards)
 ================================ */
 window.showAttractions = (btn) => openCard(btn.closest(".place-card"), "tourist_attraction");
 window.showRestaurants = (btn) => openCard(btn.closest(".place-card"), "restaurant");
@@ -291,128 +276,95 @@ function formatType(type) {
 }
 
 /* ===============================
-   GUESTS DROPDOWN LOGIC
+   GUESTS DROPDOWN LOGIC (index.html)
 ================================ */
+function setupGuestsDropdown() {
+  const dropdownBtn = document.getElementById("guestsDropdownBtn");
+  const menu = document.querySelector(".guests-menu");
+  if (!dropdownBtn || !menu || !window.bootstrap) return;
 
-const state = {
-  adults: 1,
-  children: 0,
-  toddlers: 0,
-  babies: 0
-};
-
-const limits = {
-  adults: { min: 1, max: 10 },
-  children: { min: 0, max: 10 },
-  toddlers: { min: 0, max: 10 },
-  babies: { min: 0, max: 10 }
-};
-
-const summary = document.getElementById("guestSummary");
-const warning = document.getElementById("adultWarning");
-const dropdownBtn = document.getElementById("guestsDropdownBtn");
-
-/* ===============================
-   UPDATE UI
-================================ */
-function updateUI() {
-  // Update displays
-  document.getElementById("adultsDisplay").textContent = state.adults;
-  document.getElementById("childrenDisplay").textContent = state.children;
-  document.getElementById("toddlersDisplay").textContent = state.toddlers;
-  document.getElementById("babiesDisplay").textContent = state.babies;
-
-  // Hidden inputs
-  document.getElementById("adultsCount").value = state.adults;
-  document.getElementById("childrenCount").value = state.children;
-  document.getElementById("toddlersCount").value = state.toddlers;
-  document.getElementById("babiesCount").value = state.babies;
-
-  // Button label
-  const total =
-    state.adults + state.children + state.toddlers + state.babies;
-
-  dropdownBtn.textContent = `Guests: ${total}`;
-
-  // Summary text
-  summary.textContent =
-    `Guests: ${state.adults} adult · ` +
-    `${state.children} children · ` +
-    `${state.toddlers} toddlers · ` +
-    `${state.babies} babies`;
-
-  // Disable kids if no adults
-  toggleChildControls(state.adults > 0);
-
-  // Warning
-  warning.classList.toggle("d-none", state.adults > 0);
-}
-
-/* ===============================
-   ENABLE / DISABLE CHILD CONTROLS
-================================ */
-function toggleChildControls(enabled) {
-  document.querySelectorAll(
-    '[data-type="children"], [data-type="toddlers"], [data-type="babies"]'
-  ).forEach(stepper => {
-    stepper.querySelectorAll("button").forEach(btn => {
-      btn.disabled = !enabled;
-    });
-    stepper.style.opacity = enabled ? "1" : "0.5";
+  const dd = bootstrap.Dropdown.getOrCreateInstance(dropdownBtn, {
+    autoClose: "outside",
   });
-}
 
-/* ===============================
-   STEPPER HANDLING
-================================ */
-document.querySelectorAll(".guest-stepper").forEach(stepper => {
-  stepper.addEventListener("click", e => {
-    const btn = e.target.closest("button");
-    if (!btn) return;
+  menu.addEventListener("click", (e) => e.stopPropagation());
 
-    const type = stepper.dataset.type;
-    const action = btn.dataset.action;
-    const { min, max } = limits[type];
+  const state = { adults: 1, children: 0, toddlers: 0, babies: 0 };
 
-    if (action === "plus" && state[type] < max) {
-      state[type]++;
+  const els = {
+    adultsDisplay: document.getElementById("adultsDisplay"),
+    childrenDisplay: document.getElementById("childrenDisplay"),
+    toddlersDisplay: document.getElementById("toddlersDisplay"),
+    babiesDisplay: document.getElementById("babiesDisplay"),
+    adultsCount: document.getElementById("adultsCount"),
+    childrenCount: document.getElementById("childrenCount"),
+    toddlersCount: document.getElementById("toddlersCount"),
+    babiesCount: document.getElementById("babiesCount"),
+    guestSummary: document.getElementById("guestSummary"),
+    adultWarning: document.getElementById("adultWarning"),
+  };
+
+  function updateUI() {
+    if (els.adultsDisplay) els.adultsDisplay.textContent = state.adults;
+    if (els.childrenDisplay) els.childrenDisplay.textContent = state.children;
+    if (els.toddlersDisplay) els.toddlersDisplay.textContent = state.toddlers;
+    if (els.babiesDisplay) els.babiesDisplay.textContent = state.babies;
+
+    if (els.adultsCount) els.adultsCount.value = state.adults;
+    if (els.childrenCount) els.childrenCount.value = state.children;
+    if (els.toddlersCount) els.toddlersCount.value = state.toddlers;
+    if (els.babiesCount) els.babiesCount.value = state.babies;
+
+    const total = state.adults + state.children + state.toddlers + state.babies;
+    dropdownBtn.textContent = `Guests: ${total}`;
+
+    if (els.guestSummary) {
+      els.guestSummary.textContent =
+        `Guests: ${state.adults} adult · ${state.children} children · ${state.toddlers} toddlers · ${state.babies} babies`;
     }
 
-    if (action === "minus" && state[type] > min) {
-      state[type]--;
-    }
+    const disableKids = state.adults === 0;
+    menu
+      .querySelectorAll('[data-type="children"], [data-type="toddlers"], [data-type="babies"]')
+      .forEach((stepper) => {
+        stepper.querySelectorAll("button").forEach((b) => (b.disabled = disableKids));
+        stepper.style.opacity = disableKids ? "0.5" : "1";
+      });
 
-    // If adults drop to 0 
-    if (state.adults < 1) {
-      state.adults = 1;
-    }
-
-    // Reset kids if adults = 0 
-    if (state.adults === 0) {
+    if (disableKids) {
       state.children = 0;
       state.toddlers = 0;
       state.babies = 0;
+      if (els.childrenCount) els.childrenCount.value = 0;
+      if (els.toddlersCount) els.toddlersCount.value = 0;
+      if (els.babiesCount) els.babiesCount.value = 0;
     }
 
-    document.addEventListener("click", (e) => {
-  if (e.target.closest(".guests-menu")) {
-    e.stopPropagation();
+    if (els.adultWarning) els.adultWarning.classList.toggle("d-none", state.adults >= 1);
   }
-});
 
-    updateUI();
+  menu.querySelectorAll(".step-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const stepper = btn.closest(".guest-stepper");
+      const type = stepper?.dataset.type;
+      const action = btn.dataset.action;
+      if (!type) return;
+
+      if (type === "adults") {
+        if (action === "minus") state.adults = Math.max(1, state.adults - 1);
+        if (action === "plus") state.adults = Math.min(10, state.adults + 1);
+      } else {
+        if (action === "minus") state[type] = Math.max(0, state[type] - 1);
+        if (action === "plus") state[type] = Math.min(10, state[type] + 1);
+      }
+
+      updateUI();
+      dd.show();
+    });
   });
-});
 
-/* ===============================
-   FORM SUBMIT VALIDATION
-================================ */
-document.getElementById("searchForm").addEventListener("submit", e => {
-  if (state.adults < 1) {
-    e.preventDefault();
-    warning.classList.remove("d-none");
-  }
-});
-
-/* INIT */
-updateUI();
+  updateUI();
+}
