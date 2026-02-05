@@ -368,3 +368,35 @@ function setupGuestsDropdown() {
 
   updateUI();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("searchForm");
+  if (!form) return;
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const city = document.getElementById("destination")?.value?.trim().toLowerCase();
+    const date = document.getElementById("dates")?.value; // your single date input
+
+    const adults   = parseInt(document.getElementById("adultsCount")?.value || "1", 10);
+    const children = parseInt(document.getElementById("childrenCount")?.value || "0", 10);
+    const toddlers = parseInt(document.getElementById("toddlersCount")?.value || "0", 10);
+    const babies   = parseInt(document.getElementById("babiesCount")?.value || "0", 10);
+
+    if (!city) return alert("Please select a city.");
+    if (adults < 1) return alert("At least 1 adult is required.");
+
+    const params = new URLSearchParams({
+      city,
+      date: date || "",
+      adults: String(adults),
+      children: String(children),
+      toddlers: String(toddlers),
+      babies: String(babies),
+    });
+
+    window.location.href = `book.html?${params.toString()}`;
+  });
+});
+

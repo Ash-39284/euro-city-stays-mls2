@@ -9,6 +9,14 @@
   <!-- Bootstrap link -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
+
+<!-- Google places API  -->
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I&libraries=places&v=beta&loading=async"
+  async
+  defer
+></script>
+
 <body>
 
 <!-- Navbar -->
@@ -34,18 +42,22 @@
 <section class="container my-5">
   <div class="package-hero p-4 p-lg-5">
     <div class="row g-4 align-items-center">
+      
       <div class="col-lg-7">
         <h1 class="mb-2 text-white fw-semibold">Paris City Package</h1>
         <p class="text-white-50 mb-3">
           A simple city-break bundle with hotel + attractions + local food picks.
         </p>
+      </div>
 
       <div class="col-lg-5">
         <div class="package-image rounded-4"></div>
       </div>
+
     </div>
   </div>
 </section>
+
 
 <!-- MAIN -->
 <section class="container mb-5">
@@ -258,58 +270,150 @@
 
 
 <!-- JS to update summary -->
- <script>
+  <script>
+  // --- Helpers ---
+  function titleCaseCity(slug) {
+    if (!slug) return "";
+    return slug
+      .split("-")
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  }
+
+  function getParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      city: (params.get("city") || "paris").toLowerCase(),
+      date: params.get("date") || "",
+      adults: Math.max(1, parseInt(params.get("adults") || "1", 10)),
+      children: Math.max(0, parseInt(params.get("children") || "0", 10)),
+      toddlers: Math.max(0, parseInt(params.get("toddlers") || "0", 10)),
+      babies: Math.max(0, parseInt(params.get("babies") || "0", 10)),
+    };
+  }
+
+  async function setHeroPhotoFromPlaces(textQuery) {
+    const hero = document.querySelector(".package-image");
+    if (!hero) return;
+
+    // If Places not ready, keep CSS fallback
+    if (!window.google?.maps?.places) return;
+
+    await google.maps.importLibrary("places");
+
+    const { places } = await google.maps.places.Place.searchByText({
+      textQuery,
+      maxResultCount: 1,
+      fields: ["photos"],
+    });
+
+    const photo = places?.[0]?.photos?.[0];
+    if (!photo) return;
+
+    const url = photo.getURI({ maxWidth: 1400, maxHeight: 800 });
+
+    hero.style.backgroundImage =
+      `linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.18)), url("${url}")`;
+    hero.style.backgroundSize = "cover";
+    hero.style.backgroundPosition = "center";
+  }
+
+  // --- Main booking logic ---
+  document.addEventListener("DOMContentLoaded", () => {
     const checkIn = document.getElementById("checkIn");
-    const checkOut = document.getElementbyId("checkOut");
-    const adults = document.getElementById("adult");
-    const children = document.getElementById("children");
+    const checkOut = document.getElementById("checkOut");
+
+    const adultsSel = document.getElementById("adults");
+    const childrenSel = document.getElementById("children");
+    const toddlersSel = document.getElementById("toddlers");
+    const babiesSel = document.getElementById("babies");
 
     const summaryDates = document.getElementById("summaryDates");
     const summaryGuests = document.getElementById("summaryGuests");
-    const summaryTier = document.getElemetById("summaryTier");
+    const summaryTier = document.getElementById("summaryTier");
     const summaryPrice = document.getElementById("summaryPrice");
+    const summaryCity = document.getElementById("summaryCity");
 
-    const prices = {basic: 149, plus: 199, premium: 249};
+    const prices = { basic: 149, plus: 199, premium: 249 };
 
+    const p = getParams();
+
+    // --- Set heading + summary city ---
+    const cityName = titleCaseCity(p.city);
+    const h1 = document.querySelector(".package-hero h1");
+    if (h1) h1.textContent = `${cityName} City Package`;
+    if (summaryCity) summaryCity.textContent = cityName;
+
+    // --- Prefill form from URL ---
+    if (checkIn && p.date) checkIn.value = p.date;
+
+    if (adultsSel) adultsSel.value = String(p.adults);
+    if (childrenSel) childrenSel.value = String(p.children);
+    if (toddlersSel) toddlersSel.value = String(p.toddlers);
+    if (babiesSel) babiesSel.value = String(p.babies);
+
+    // --- Update functions ---
     function updateDates() {
-        if (checkIn.value && checkOut.value) {
-            summaryDates.textContent = `${checkIn.value} => ${checkOut.value}`;
-        } else {
-            summaryDates.textContent = "Select Dates";
-        }
+      if (checkIn?.value && checkOut?.value) {
+        summaryDates.textContent = `${checkIn.value} → ${checkOut.value}`;
+      } else {
+        summaryDates.textContent = "Select dates";
+      }
+      if (checkIn?.value && checkOut) checkOut.min = checkIn.value;
     }
 
-    function updateGuests () {
-        const a = parseInt(adults.value, 10);
-        const c = parseInt(children.value, 10);
+    function updateGuests() {
+      let a = parseInt(adultsSel?.value || "1", 10);
+      let c = parseInt(childrenSel?.value || "0", 10);
+      let t = parseInt(toddlersSel?.value || "0", 10);
+      let b = parseInt(babiesSel?.value || "0", 10);
 
-        // if adults comes back to 0, this ensures it goes back to 1
+      // enforce minimum 1 adult
+      if (a < 1) {
+        a = 1;
+        if (adultsSel) adultsSel.value = "1";
+      }
 
-        if (a < 1) {
-            adults.value = "1"
-        }
+      let text = `${a} adult${a > 1 ? "s" : ""}`;
+      if (c > 0) text += ` · ${c} ${c === 1 ? "child" : "children"}`;
+      if (t > 0) text += ` · ${t} toddler${t > 1 ? "s" : ""}`;
+      if (b > 0) text += ` · ${b} bab${b === 1 ? "y" : "ies"}`;
 
-        let text = `${adults.value} adult${adults.value > 1 ? "s" : ""}`;
-        if (c > 0) text += ` · ${children.value} child${c > 1 ? "ren" : ""}`;
-        summaryGuests.textContent = text; 
+      summaryGuests.textContent = text;
     }
 
     function updateTier() {
-        const selected = document.querySelector('input[name="tier"]:checked').value;
-        summaryTier.textContent = selected.charAt(0).toUpperCase() + selected.slice(1);
-        summaryPrice.textContent = `£${prices[selected]}`;
+      const selected = document.querySelector('input[name="tier"]:checked')?.value || "basic";
+      summaryTier.textContent = selected.charAt(0).toUpperCase() + selected.slice(1);
+      summaryPrice.textContent = `£${prices[selected]}`;
     }
 
-    [checkIn, checkOut].forEach (el => el.addEventListener("change", updateDates));
-    [adults, children].forEach (el => el.addEventListener("change", updateGuests));
+    // --- listeners ---
+    [checkIn, checkOut].forEach(el => el && el.addEventListener("change", updateDates));
+    [adultsSel, childrenSel, toddlersSel, babiesSel].forEach(el => el && el.addEventListener("change", updateGuests));
     document.querySelectorAll('input[name="tier"]').forEach(r => r.addEventListener("change", updateTier));
 
+    // init summary
     updateDates();
     updateGuests();
     updateTier();
 
+    // --- Hero image from Places (when Google is ready) ---
+    const query = `${cityName} city`;
+    let tries = 0;
+    const timer = setInterval(async () => {
+      tries++;
+      if (window.google?.maps?.places) {
+        clearInterval(timer);
+        setHeroPhotoFromPlaces(query).catch(console.warn);
+      }
+      if (tries > 40) clearInterval(timer); // ~4s max
+    }, 100);
+  });
+</script>
 
- </script>
+
+</script>
 
 
 

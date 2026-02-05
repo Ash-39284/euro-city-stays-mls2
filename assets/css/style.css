@@ -272,9 +272,12 @@ body{
 .package-image {
   height: 220px;
   width: 100%;
+  border-radius: 20px;
   background: rgba(255,255,255,0.2);
   border: 1px solid rgba(255,255,255,0.25);
 }
+
+
 
 /* mobile media query */
 @media (max-width: 768px) {
@@ -283,3 +286,14 @@ body{
     text-align: center;
   }
 }
+
+@media (max-width: 768px) {
+  .package-image {
+    height: 180px;
+  }
+
+  .package-hero h1 {
+    font-size: 2rem;
+  }
+}
+
