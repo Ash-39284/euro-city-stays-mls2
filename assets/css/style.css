@@ -162,6 +162,26 @@ body{
   border-radius: 10px;
 }
 
+.place-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.place-photo {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+}
+
+/* keep action buttons from stretching weirdly */
+.card-actions .btn {
+  white-space: nowrap;
+}
+
+
 /* footer styles */
 .footer {
   font-size: 0.9rem;
@@ -297,3 +317,19 @@ body{
   }
 }
 
+@media (max-width: 768px) {
+  .package-hero {
+    text-align: center;
+  }
+
+  .package-image {
+    height: 180px;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .booking-summary {
+    position: static !important;
+  }
+}
