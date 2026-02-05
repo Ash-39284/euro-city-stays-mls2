@@ -400,3 +400,33 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+const saved = {
+  city,
+  date,
+  adults,
+  children,
+  toddlers,
+  babies,
+};
+sessionStorage.setItem("ECS_SEARCH", JSON.stringify(saved));
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const city = document.getElementById("destination")?.value?.trim().toLowerCase();
+  const date = document.getElementById("dates")?.value || "";
+
+  const adults   = parseInt(document.getElementById("adultsCount")?.value || "1", 10);
+  const children = parseInt(document.getElementById("childrenCount")?.value || "0", 10);
+  const toddlers = parseInt(document.getElementById("toddlersCount")?.value || "0", 10);
+  const babies   = parseInt(document.getElementById("babiesCount")?.value || "0", 10);
+
+  if (!city) return alert("Please select a city.");
+  if (adults < 1) return alert("At least 1 adult is required.");
+
+  sessionStorage.setItem("ECS_SEARCH", JSON.stringify({ city, date, adults, children, toddlers, babies }));
+
+  // go to destinations (or book — your choice)
+  window.location.href = `destinations.html?city=${encodeURIComponent(city)}`;
+});
+

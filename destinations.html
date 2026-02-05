@@ -27,7 +27,13 @@ function attachCardClickHandlers() {
   document.querySelectorAll(".place-card").forEach(card => {
     card.addEventListener("click", () => openCard(card, "tourist_attraction"));
   });
+
+  // Prevent card click when pressing buttons inside card
+  document.querySelectorAll(".place-card button").forEach(btn => {
+    btn.addEventListener("click", (e) => e.stopPropagation());
+  });
 }
+
 
 // ---------- AUTO OPEN FROM URL ----------
 function autoOpenCityFromSearch() {
@@ -240,6 +246,31 @@ window.addEventListener("load", () => {
   initMap();
 });
 
+window.bookCity = (btn) => {
+  const card = btn.closest(".place-card");
+  if (!card) return;
+
+  const city = (card.dataset.city || "").toLowerCase();
+  if (!city) return;
+
+  // OPTIONAL: if you stored search data earlier in sessionStorage, use it
+  const saved = JSON.parse(sessionStorage.getItem("ECS_SEARCH") || "{}");
+
+  const params = new URLSearchParams({
+    city,
+    date: saved.date || "",
+    adults: String(saved.adults ?? 1),
+    children: String(saved.children ?? 0),
+    toddlers: String(saved.toddlers ?? 0),
+    babies: String(saved.babies ?? 0),
+  });
+
+  window.location.href = `book.html?${params.toString()}`;
+};
+
+document.querySelectorAll(".place-card button").forEach((b) => {
+  b.addEventListener("click", (e) => e.stopPropagation());
+});
 
 
 </script>
@@ -273,36 +304,37 @@ window.addEventListener("load", () => {
 
   <!-- PARIS -->
   <div class="row g-4 mb-5">
-    <div class="col-md-4">
-     <div class="place-card" data-city="paris" data-lat="48.8566" data-lng="2.3522">
-  <img class="place-photo" alt="City photo" />
-  <div>
-    <h6>Paris</h6>
-    <small>Paris, France</small>
+  <div class="col-md-4">
+    <div class="place-card" data-city="paris" data-lat="48.8566" data-lng="2.3522">
+      <img class="place-photo" alt="City photo" />
 
-     <ul class="poi-results list-unstyled mt-2 collapse"></ul>
-  </div>
+      <div>
+        <h6>Paris</h6>
+        <small>Paris, France</small>
+        <ul class="poi-results list-unstyled mt-2 collapse"></ul>
+      </div>
 
-   <div class="d-flex gap-2 mt-2">
-    <button class="btn btn-sm btn-outline-primary"
-      onclick="showAttractions(this)">
-      Attractions
-    </button>
-    <button class="btn btn-sm btn-outline-success"
-      onclick="showRestaurants(this)">
-      Food
-    </button>
-    <button class="btn btn-sm btn-outline-danger"
-      onclick="showHotels(this)">
-      Hotels
-    </button><button class="btn btn-sm btn-warning text-dark"
-  onclick="bookCity(this)">
-  Book now
-</button>
+      <div class="d-flex gap-2 mt-2 flex-wrap">
+        <button class="btn btn-sm btn-outline-primary" onclick="showAttractions(this)">
+          Attractions
+        </button>
 
+        <button class="btn btn-sm btn-outline-success" onclick="showRestaurants(this)">
+          Food
+        </button>
+
+        <button class="btn btn-sm btn-outline-danger" onclick="showHotels(this)">
+          Hotels
+        </button>
+
+        <button class="btn btn-sm btn-warning text-dark" onclick="bookCity(this)">
+          Book now
+        </button>
+      </div>
+    </div>
   </div>
 </div>
-</div>
+
 
     <div class="col-md-4">
       <div class="place-card" 
