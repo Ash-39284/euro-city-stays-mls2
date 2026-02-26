@@ -297,21 +297,55 @@ body{
   border: 1px solid rgba(255,255,255,0.25);
 }
 
-/* thank-you text styling */
+/* Thank-you page */
+.thank-you-page {
+  background: linear-gradient(180deg, #fff6e5 0%, #fff 100%);
+}
 
-.thank-you-txt{
-  background-color: #FFA239;
-  color: #FEEE91;
+.thank-you-wrap {
+  background-color: #ffa239;
+  color: #fff;
   border-radius: 28px;
-  text-align: center;
 }
 
-#thnx{
-  padding: 24px 24px 32px 32px;
+.thank-you-badge {
+  display: inline-block;
+  background: #feee91;
+  color: #5a3b10;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
-#thnx-sub{
- padding-bottom: 24px;
+.thank-you-title {
+  color: #feee91;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+}
+
+.thank-you-copy {
+  color: #fff4d3;
+  max-width: 48ch;
+}
+
+.thank-you-summary {
+  background: #fff;
+  color: #333;
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #efefef;
+}
+
+.summary-line:last-child {
+  border-bottom: none;
 }
 
 
@@ -320,6 +354,12 @@ body{
   .search-title {
     font-size: 1.6rem;
     text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .thank-you-title {
+    font-size: 1.7rem;
   }
 }
 

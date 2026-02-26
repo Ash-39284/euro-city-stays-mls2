@@ -32,15 +32,48 @@
   </div>
 </nav>
 
-<div class="thank-you-txt">
-  <h2 id="thnx">
-    Thank you!
-  </h2>
+<main class="thank-you-page py-5">
+  <section class="container">
+    <div class="thank-you-wrap p-4 p-lg-5">
+      <div class="row g-4 align-items-start">
+        <div class="col-lg-7">
+          <span class="thank-you-badge">Booking confirmed</span>
+          <h1 class="thank-you-title mt-3 mb-3">Thank you for booking with Euro City Stays</h1>
+          <p class="thank-you-copy mb-4">
+            Your request has been received and we are preparing your package details. You are all set for your upcoming city break.
+          </p>
 
-  <h3 id="thnx-sub">
-    Thank you for choosing to book your holiday with euro city stays. Enjoy your trip!
-  </h3>
-</div>
+          <div class="d-flex flex-wrap gap-2">
+            <a href="index.html" class="btn btn-danger px-4">Back to home</a>
+            <a href="destinations.html" class="btn btn-outline-secondary px-4">Explore destinations</a>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <aside class="thank-you-summary p-4">
+            <h2 class="h5 mb-3">Booking Snapshot</h2>
+            <div class="summary-line">
+              <span>Reference</span>
+              <strong id="bookingRef">ECS-2026-001</strong>
+            </div>
+            <div class="summary-line">
+              <span>Destination</span>
+              <strong id="bookingDestination">Paris</strong>
+            </div>
+            <div class="summary-line">
+              <span>Guests</span>
+              <strong id="bookingGuests">1 adult</strong>
+            </div>
+            <div class="summary-line">
+              <span>Package</span>
+              <strong id="bookingPackage">Basic</strong>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
 
 
 
@@ -54,6 +87,8 @@
 
 <!-- Bootstrap script -->
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<!-- App script -->
+<script src="./assets/js/script.js"></script>
     
 </body>
 </html>

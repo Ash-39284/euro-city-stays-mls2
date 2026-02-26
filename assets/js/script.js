@@ -1,286 +1,53 @@
-// google maps API key
-// AIzaSyAJoOGB75_bpzjqUae_aj1kBl_JIZJdu4I
-
 let map;
 let poiMarkers = [];
 
-/* ===============================
-   BOOT (runs on ALL pages safely)
-================================ */
-window.addEventListener("load", async () => {
-  // Home/search submit setup
-  setupSearchRedirect();
-
-  // Guests dropdown setup (home page)
-  setupGuestsDropdown();
-
-  // Destinations map setup
-  if (window.google?.maps && document.getElementById("map")) {
-    await initMap();
-  }
+window.addEventListener("DOMContentLoaded", () => {
+  setupHomePage();
+  setupDestinationsPage();
+  setupBookPage();
+  setupThankYouPage();
 });
 
-/* ===============================
-   SEARCH REDIRECT (index.html)
-================================ */
-function setupSearchRedirect() {
+function setupHomePage() {
   const form = document.getElementById("searchForm");
   if (!form) return;
+
+  setupGuestsDropdown();
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
     const city = document.getElementById("destination")?.value?.trim().toLowerCase();
-    const adults = parseInt(document.getElementById("adultsCount")?.value || "1", 10);
+    const date = document.querySelector('input[name="dates"]')?.value || "";
 
-    if (!city) return alert("Please select a city");
-    if (adults < 1) return alert("At least 1 adult is required");
+    const adults = parseInt(document.getElementById("adultsCount")?.value || "1", 10);
+    const children = parseInt(document.getElementById("childrenCount")?.value || "0", 10);
+    const toddlers = parseInt(document.getElementById("toddlersCount")?.value || "0", 10);
+    const babies = parseInt(document.getElementById("babiesCount")?.value || "0", 10);
+
+    if (!city) {
+      alert("Please select a city.");
+      return;
+    }
+
+    if (adults < 1) {
+      alert("At least 1 adult is required.");
+      return;
+    }
+
+    sessionStorage.setItem(
+      "ECS_SEARCH",
+      JSON.stringify({ city, date, adults, children, toddlers, babies })
+    );
 
     window.location.href = `destinations.html?city=${encodeURIComponent(city)}`;
   });
 }
 
-/* ===============================
-   INIT MAP (destinations.html only)
-================================ */
-async function initMap() {
-  const mapEl = document.getElementById("map");
-  if (!mapEl) return;
-
-  await google.maps.importLibrary("maps");
-  await google.maps.importLibrary("places");
-
-  map = new google.maps.Map(mapEl, {
-    center: { lat: 50.8503, lng: 4.3517 },
-    zoom: 5,
-  });
-
-  attachCardClickHandlers();
-  await hydrateCityImages();
-  autoOpenCityFromSearch();
-}
-
-/* ===============================
-   CARD CLICK HANDLING
-================================ */
-function attachCardClickHandlers() {
-  document.querySelectorAll(".place-card").forEach((card) => {
-    card.addEventListener("click", () => openCard(card, "tourist_attraction"));
-  });
-
-  // Prevent card-click when pressing buttons inside the card
-  document.querySelectorAll(".place-card button").forEach((btn) => {
-    btn.addEventListener("click", (e) => e.stopPropagation());
-  });
-}
-
-/* ===============================
-   AUTO-OPEN CITY FROM URL
-   destinations.html?city=paris
-================================ */
-function autoOpenCityFromSearch() {
-  const params = new URLSearchParams(window.location.search);
-  const city = params.get("city");
-  if (!city) return;
-
-  const card = document.querySelector(`.place-card[data-city="${city.toLowerCase()}"]`);
-  if (!card) return;
-
-  card.scrollIntoView({ behavior: "smooth", block: "center" });
-  openCard(card, "tourist_attraction");
-}
-
-/* ===============================
-   OPEN CARD (collapse + zoom + load)
-================================ */
-async function openCard(card, type) {
-  collapseAllCards(card);
-
-  const lat = parseFloat(card.dataset.lat);
-  const lng = parseFloat(card.dataset.lng);
-
-  map.panTo({ lat, lng });
-  map.setZoom(12);
-
-  await fetchPOIs(card, type);
-}
-
-/* ===============================
-   COLLAPSE OTHER CARDS
-================================ */
-function collapseAllCards(activeCard) {
-  document.querySelectorAll(".place-card").forEach((card) => {
-    const list = card.querySelector(".poi-results");
-    if (!list) return;
-
-    if (card === activeCard) {
-      list.classList.add("show");
-    } else {
-      list.classList.remove("show");
-      list.innerHTML = "";
-    }
-  });
-}
-
-/* ===============================
-   FETCH POIs + MARKERS
-================================ */
-async function fetchPOIs(card, type) {
-  const lat = parseFloat(card.dataset.lat);
-  const lng = parseFloat(card.dataset.lng);
-  const list = card.querySelector(".poi-results");
-  if (!list) return;
-
-  clearPoiMarkers();
-  list.classList.add("show");
-  list.innerHTML = `<li class="text-muted">Loading...</li>`;
-
-  try {
-    const { places } = await google.maps.places.Place.searchNearby({
-      locationRestriction: { center: { lat, lng }, radius: 3000 },
-      includedTypes: [type],
-      maxResultCount: 6,
-      fields: ["displayName", "rating", "photos", "location"],
-    });
-
-    list.innerHTML = "";
-
-    if (!places?.length) {
-      list.innerHTML = `<li class="text-muted">No places found</li>`;
-      return;
-    }
-
-    const info = new google.maps.InfoWindow();
-    const bounds = new google.maps.LatLngBounds();
-
-    places.forEach((place, index) => {
-      const photoUrl = place.photos?.length
-        ? place.photos[0].getURI({ maxWidth: 220, maxHeight: 160 })
-        : null;
-
-      // --- LIST UI ---
-      const li = document.createElement("li");
-      li.className = "mb-2";
-      li.innerHTML = `
-        <div class="poi-card">
-          ${photoUrl ? `<img src="${photoUrl}" class="poi-photo" alt="${place.displayName}">` : ""}
-          <div class="w-100">
-            <div class="poi-header">
-              <span class="poi-name">${index + 1}. ${place.displayName}</span>
-              ${place.rating ? `<span class="poi-rating">⭐ ${place.rating}</span>` : ""}
-            </div>
-            <div class="poi-type">${formatType(type)}</div>
-          </div>
-        </div>
-      `;
-
-      li.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (!place.location) return;
-        map.panTo(place.location);
-        map.setZoom(15);
-      });
-
-      list.appendChild(li);
-
-      // --- MARKER ---
-      if (place.location) {
-        bounds.extend(place.location);
-
-        const marker = new google.maps.Marker({
-          map,
-          position: place.location,
-          title: place.displayName,
-          label: `${index + 1}`,
-        });
-
-        marker.addListener("click", () => {
-          info.setContent(`
-            <div style="min-width:180px">
-              <strong>${place.displayName}</strong><br/>
-              ${place.rating ? `⭐ ${place.rating}` : "No rating"}<br/>
-              <small>${formatType(type)}</small>
-            </div>
-          `);
-          info.open({ map, anchor: marker });
-        });
-
-        poiMarkers.push(marker);
-      }
-    });
-
-    // Fit markers
-    if (poiMarkers.length >= 2) {
-      map.fitBounds(bounds);
-    } else {
-      map.setZoom(13);
-    }
-  } catch (err) {
-    console.error("Places error:", err);
-    list.innerHTML = `<li class="text-danger">Error loading places</li>`;
-  }
-}
-
-function clearPoiMarkers() {
-  poiMarkers.forEach((m) => m.setMap(null));
-  poiMarkers = [];
-}
-
-/* ===============================
-   CITY CARD IMAGES (Places Photos)
-================================ */
-async function hydrateCityImages() {
-  const cards = document.querySelectorAll(".place-card");
-
-  for (const card of cards) {
-    const lat = parseFloat(card.dataset.lat);
-    const lng = parseFloat(card.dataset.lng);
-
-    const img = card.querySelector("img.place-photo");
-    if (!img || !lat || !lng) continue;
-
-    if (img.getAttribute("src")) continue; // keep existing images
-
-    try {
-      const { places } = await google.maps.places.Place.searchNearby({
-        locationRestriction: { center: { lat, lng }, radius: 5000 },
-        includedTypes: ["tourist_attraction"],
-        maxResultCount: 1,
-        fields: ["photos"],
-      });
-
-      const photo = places?.[0]?.photos?.[0];
-      if (!photo) continue;
-
-      img.src = photo.getURI({ maxWidth: 600, maxHeight: 400 });
-    } catch (err) {
-      console.warn("City image failed:", card.dataset.city, err);
-    }
-  }
-}
-
-/* ===============================
-   BUTTONS (destinations cards)
-================================ */
-window.showAttractions = (btn) => openCard(btn.closest(".place-card"), "tourist_attraction");
-window.showRestaurants = (btn) => openCard(btn.closest(".place-card"), "restaurant");
-window.showHotels = (btn) => openCard(btn.closest(".place-card"), "lodging");
-
-/* ===============================
-   LABELS
-================================ */
-function formatType(type) {
-  if (type === "restaurant") return "🍽 Restaurant";
-  if (type === "lodging") return "🏨 Hotel";
-  return "📍 Attraction";
-}
-
-/* ===============================
-   GUESTS DROPDOWN LOGIC (index.html)
-================================ */
 function setupGuestsDropdown() {
   const dropdownBtn = document.getElementById("guestsDropdownBtn");
   const menu = document.querySelector(".guests-menu");
+
   if (!dropdownBtn || !menu || !window.bootstrap) return;
 
   const dd = bootstrap.Dropdown.getOrCreateInstance(dropdownBtn, {
@@ -320,27 +87,13 @@ function setupGuestsDropdown() {
 
     if (els.guestSummary) {
       els.guestSummary.textContent =
-        `Guests: ${state.adults} adult · ${state.children} children · ${state.toddlers} toddlers · ${state.babies} babies`;
+        `Guests: ${state.adults} adult${state.adults > 1 ? "s" : ""} · ` +
+        `${state.children} children · ${state.toddlers} toddlers · ${state.babies} babies`;
     }
 
-    const disableKids = state.adults === 0;
-    menu
-      .querySelectorAll('[data-type="children"], [data-type="toddlers"], [data-type="babies"]')
-      .forEach((stepper) => {
-        stepper.querySelectorAll("button").forEach((b) => (b.disabled = disableKids));
-        stepper.style.opacity = disableKids ? "0.5" : "1";
-      });
-
-    if (disableKids) {
-      state.children = 0;
-      state.toddlers = 0;
-      state.babies = 0;
-      if (els.childrenCount) els.childrenCount.value = 0;
-      if (els.toddlersCount) els.toddlersCount.value = 0;
-      if (els.babiesCount) els.babiesCount.value = 0;
+    if (els.adultWarning) {
+      els.adultWarning.classList.toggle("d-none", state.adults >= 1);
     }
-
-    if (els.adultWarning) els.adultWarning.classList.toggle("d-none", state.adults >= 1);
   }
 
   menu.querySelectorAll(".step-btn").forEach((btn) => {
@@ -369,64 +122,481 @@ function setupGuestsDropdown() {
   updateUI();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("searchForm");
-  if (!form) return;
+function setupDestinationsPage() {
+  const mapEl = document.getElementById("map");
+  if (!mapEl) return;
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
+  initMapWhenReady();
+}
 
-    const city = document.getElementById("destination")?.value?.trim().toLowerCase();
-    const date = document.getElementById("dates")?.value; // your single date input
+function initMapWhenReady() {
+  let tries = 0;
+  const timer = setInterval(async () => {
+    tries += 1;
 
-    const adults   = parseInt(document.getElementById("adultsCount")?.value || "1", 10);
-    const children = parseInt(document.getElementById("childrenCount")?.value || "0", 10);
-    const toddlers = parseInt(document.getElementById("toddlersCount")?.value || "0", 10);
-    const babies   = parseInt(document.getElementById("babiesCount")?.value || "0", 10);
+    if (window.google?.maps?.importLibrary) {
+      clearInterval(timer);
+      try {
+        await initMap();
+      } catch (err) {
+        console.error("Map init failed:", err);
+      }
+      return;
+    }
 
-    if (!city) return alert("Please select a city.");
-    if (adults < 1) return alert("At least 1 adult is required.");
+    if (tries > 80) {
+      clearInterval(timer);
+      console.error("Google Maps did not load.");
+    }
+  }, 100);
+}
 
-    const params = new URLSearchParams({
-      city,
-      date: date || "",
-      adults: String(adults),
-      children: String(children),
-      toddlers: String(toddlers),
-      babies: String(babies),
+async function initMap() {
+  const mapEl = document.getElementById("map");
+  if (!mapEl) return;
+
+  await google.maps.importLibrary("maps");
+  await google.maps.importLibrary("places");
+
+  map = new google.maps.Map(mapEl, {
+    center: { lat: 50.8503, lng: 4.3517 },
+    zoom: 5,
+  });
+
+  attachCardClickHandlers();
+  await hydrateCityImages();
+  autoOpenCityFromSearch();
+}
+
+function attachCardClickHandlers() {
+  document.querySelectorAll(".place-card").forEach((card) => {
+    card.addEventListener("click", () => openCard(card, "tourist_attraction"));
+  });
+
+  document.querySelectorAll(".place-card button").forEach((btn) => {
+    btn.addEventListener("click", (e) => e.stopPropagation());
+  });
+}
+
+function autoOpenCityFromSearch() {
+  const params = new URLSearchParams(window.location.search);
+  const city = params.get("city");
+  if (!city) return;
+
+  const card = document.querySelector(`.place-card[data-city="${city.toLowerCase()}"]`);
+  if (!card) return;
+
+  card.scrollIntoView({ behavior: "smooth", block: "center" });
+  openCard(card, "tourist_attraction");
+}
+
+async function openCard(card, type) {
+  collapseAllCards(card);
+
+  if (map) {
+    const lat = parseFloat(card.dataset.lat);
+    const lng = parseFloat(card.dataset.lng);
+    map.panTo({ lat, lng });
+    map.setZoom(12);
+  }
+
+  await fetchPOIs(card, type);
+}
+
+function collapseAllCards(activeCard) {
+  document.querySelectorAll(".place-card").forEach((card) => {
+    const list = card.querySelector(".poi-results");
+    if (!list) return;
+
+    if (card === activeCard) {
+      list.classList.add("show");
+    } else {
+      list.classList.remove("show");
+      list.innerHTML = "";
+    }
+  });
+}
+
+async function fetchPOIs(card, type) {
+  if (!window.google?.maps?.places || !map) return;
+
+  const lat = parseFloat(card.dataset.lat);
+  const lng = parseFloat(card.dataset.lng);
+  const list = card.querySelector(".poi-results");
+  if (!list) return;
+
+  clearPoiMarkers();
+  list.classList.add("show");
+  list.innerHTML = '<li class="text-muted">Loading...</li>';
+
+  try {
+    const { places } = await google.maps.places.Place.searchNearby({
+      locationRestriction: { center: { lat, lng }, radius: 3000 },
+      includedTypes: [type],
+      maxResultCount: 6,
+      fields: ["displayName", "rating", "photos", "location"],
     });
 
-    window.location.href = `book.html?${params.toString()}`;
+    list.innerHTML = "";
+
+    if (!places?.length) {
+      list.innerHTML = '<li class="text-muted">No places found</li>';
+      return;
+    }
+
+    const info = new google.maps.InfoWindow();
+    const bounds = new google.maps.LatLngBounds();
+
+    places.forEach((place, index) => {
+      const photoUrl = place.photos?.length
+        ? place.photos[0].getURI({ maxWidth: 220, maxHeight: 160 })
+        : null;
+
+      const li = document.createElement("li");
+      li.className = "mb-2";
+      li.innerHTML = `
+        <div class="poi-card">
+          ${photoUrl ? `<img src="${photoUrl}" class="poi-photo" alt="${place.displayName}">` : ""}
+          <div class="w-100">
+            <div class="poi-header">
+              <span class="poi-name">${index + 1}. ${place.displayName}</span>
+              ${place.rating ? `<span class="poi-rating">⭐ ${place.rating}</span>` : ""}
+            </div>
+            <div class="poi-type">${formatType(type)}</div>
+          </div>
+        </div>
+      `;
+
+      li.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!place.location) return;
+        map.panTo(place.location);
+        map.setZoom(15);
+      });
+
+      list.appendChild(li);
+
+      if (place.location) {
+        bounds.extend(place.location);
+
+        const marker = new google.maps.Marker({
+          map,
+          position: place.location,
+          title: place.displayName,
+          label: `${index + 1}`,
+        });
+
+        marker.addListener("click", () => {
+          info.setContent(`
+            <div style="min-width:180px">
+              <strong>${place.displayName}</strong><br/>
+              ${place.rating ? `⭐ ${place.rating}` : "No rating"}<br/>
+              <small>${formatType(type)}</small>
+            </div>
+          `);
+          info.open({ map, anchor: marker });
+        });
+
+        poiMarkers.push(marker);
+      }
+    });
+
+    if (poiMarkers.length >= 2) {
+      map.fitBounds(bounds);
+    } else {
+      map.setZoom(13);
+    }
+  } catch (err) {
+    console.error("Places error:", err);
+    list.innerHTML = '<li class="text-danger">Error loading places</li>';
+  }
+}
+
+function clearPoiMarkers() {
+  poiMarkers.forEach((m) => m.setMap(null));
+  poiMarkers = [];
+}
+
+async function hydrateCityImages() {
+  if (!window.google?.maps?.places) return;
+
+  const cards = document.querySelectorAll(".place-card");
+
+  for (const card of cards) {
+    const lat = parseFloat(card.dataset.lat);
+    const lng = parseFloat(card.dataset.lng);
+
+    const img = card.querySelector("img.place-photo");
+    if (!img || Number.isNaN(lat) || Number.isNaN(lng)) continue;
+    if (img.getAttribute("src")) continue;
+
+    try {
+      const { places } = await google.maps.places.Place.searchNearby({
+        locationRestriction: { center: { lat, lng }, radius: 5000 },
+        includedTypes: ["tourist_attraction"],
+        maxResultCount: 1,
+        fields: ["photos"],
+      });
+
+      const photo = places?.[0]?.photos?.[0];
+      if (!photo) continue;
+
+      img.src = photo.getURI({ maxWidth: 600, maxHeight: 400 });
+    } catch (err) {
+      console.warn("City image failed:", card.dataset.city, err);
+    }
+  }
+}
+
+window.showAttractions = (btn) => openCard(btn.closest(".place-card"), "tourist_attraction");
+window.showRestaurants = (btn) => openCard(btn.closest(".place-card"), "restaurant");
+window.showHotels = (btn) => openCard(btn.closest(".place-card"), "lodging");
+
+window.bookCity = (btn) => {
+  const card = btn.closest(".place-card");
+  if (!card) return;
+
+  const city = (card.dataset.city || "").toLowerCase();
+  if (!city) return;
+
+  const saved = JSON.parse(sessionStorage.getItem("ECS_SEARCH") || "{}");
+
+  const params = new URLSearchParams({
+    city,
+    date: saved.date || "",
+    adults: String(saved.adults ?? 1),
+    children: String(saved.children ?? 0),
+    toddlers: String(saved.toddlers ?? 0),
+    babies: String(saved.babies ?? 0),
   });
-});
 
-const saved = {
-  city,
-  date,
-  adults,
-  children,
-  toddlers,
-  babies,
+  window.location.href = `book.html?${params.toString()}`;
 };
-sessionStorage.setItem("ECS_SEARCH", JSON.stringify(saved));
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
+function formatType(type) {
+  if (type === "restaurant") return "🍽 Restaurant";
+  if (type === "lodging") return "🏨 Hotel";
+  return "📍 Attraction";
+}
 
-  const city = document.getElementById("destination")?.value?.trim().toLowerCase();
-  const date = document.getElementById("dates")?.value || "";
+function setupBookPage() {
+  const checkIn = document.getElementById("checkIn");
+  const checkOut = document.getElementById("checkOut");
+  if (!checkIn || !checkOut) return;
 
-  const adults   = parseInt(document.getElementById("adultsCount")?.value || "1", 10);
-  const children = parseInt(document.getElementById("childrenCount")?.value || "0", 10);
-  const toddlers = parseInt(document.getElementById("toddlersCount")?.value || "0", 10);
-  const babies   = parseInt(document.getElementById("babiesCount")?.value || "0", 10);
+  const adultsSel = document.getElementById("adults");
+  const childrenSel = document.getElementById("children");
+  const toddlersSel = document.getElementById("toddlers");
+  const babiesSel = document.getElementById("babies");
 
-  if (!city) return alert("Please select a city.");
-  if (adults < 1) return alert("At least 1 adult is required.");
+  const summaryDates = document.getElementById("summaryDates");
+  const summaryGuests = document.getElementById("summaryGuests");
+  const summaryTier = document.getElementById("summaryTier");
+  const summaryPrice = document.getElementById("summaryPrice");
+  const summaryCity = document.getElementById("summaryCity");
+  const confirmBtn = document.getElementById("confirmBtn");
 
-  sessionStorage.setItem("ECS_SEARCH", JSON.stringify({ city, date, adults, children, toddlers, babies }));
+  const prices = { basic: 149, plus: 199, premium: 249 };
+  const p = getBookingParams();
 
-  // go to destinations (or book — your choice)
-  window.location.href = `destinations.html?city=${encodeURIComponent(city)}`;
-});
+  const cityName = titleCaseCity(p.city);
+  const heading = document.querySelector(".package-hero h1");
+  if (heading) heading.textContent = `${cityName} City Package`;
+  if (summaryCity) summaryCity.textContent = cityName;
 
+  if (checkIn && p.date) checkIn.value = p.date;
+
+  if (adultsSel) adultsSel.value = String(p.adults);
+  if (childrenSel) childrenSel.value = String(p.children);
+  if (toddlersSel) toddlersSel.value = String(p.toddlers);
+  if (babiesSel) babiesSel.value = String(p.babies);
+
+  function updateDates() {
+    if (!summaryDates) return;
+
+    if (checkIn.value && checkOut.value) {
+      summaryDates.textContent = `${checkIn.value} → ${checkOut.value}`;
+    } else {
+      summaryDates.textContent = "Select dates";
+    }
+
+    if (checkIn.value) {
+      checkOut.min = checkIn.value;
+    }
+  }
+
+  function updateGuests() {
+    if (!summaryGuests) return;
+
+    let a = parseInt(adultsSel?.value || "1", 10);
+    const c = parseInt(childrenSel?.value || "0", 10);
+    const t = parseInt(toddlersSel?.value || "0", 10);
+    const b = parseInt(babiesSel?.value || "0", 10);
+
+    if (a < 1) {
+      a = 1;
+      if (adultsSel) adultsSel.value = "1";
+    }
+
+    let text = `${a} adult${a > 1 ? "s" : ""}`;
+    if (c > 0) text += ` · ${c} ${c === 1 ? "child" : "children"}`;
+    if (t > 0) text += ` · ${t} toddler${t > 1 ? "s" : ""}`;
+    if (b > 0) text += ` · ${b} bab${b === 1 ? "y" : "ies"}`;
+
+    summaryGuests.textContent = text;
+  }
+
+  function updateTier() {
+    if (!summaryTier || !summaryPrice) return;
+
+    const selected = document.querySelector('input[name="tier"]:checked')?.value || "basic";
+    summaryTier.textContent = selected.charAt(0).toUpperCase() + selected.slice(1);
+    summaryPrice.textContent = `£${prices[selected]}`;
+  }
+
+  function updateConfirmLink() {
+    if (!confirmBtn) return;
+
+    const selectedTier = document.querySelector('input[name="tier"]:checked')?.value || "basic";
+
+    const params = new URLSearchParams({
+      city: p.city,
+      adults: adultsSel?.value || "1",
+      children: childrenSel?.value || "0",
+      toddlers: toddlersSel?.value || "0",
+      babies: babiesSel?.value || "0",
+      tier: selectedTier,
+      checkin: checkIn.value || "",
+      checkout: checkOut.value || "",
+    });
+
+    confirmBtn.href = `thank-you.html?${params.toString()}`;
+  }
+
+  [checkIn, checkOut].forEach((el) => el.addEventListener("change", () => {
+    updateDates();
+    updateConfirmLink();
+  }));
+
+  [adultsSel, childrenSel, toddlersSel, babiesSel].forEach((el) => {
+    if (!el) return;
+    el.addEventListener("change", () => {
+      updateGuests();
+      updateConfirmLink();
+    });
+  });
+
+  document.querySelectorAll('input[name="tier"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+      updateTier();
+      updateConfirmLink();
+    });
+  });
+
+  updateDates();
+  updateGuests();
+  updateTier();
+  updateConfirmLink();
+
+  const query = `${cityName} city`;
+  setHeroPhotoWhenReady(query);
+}
+
+function getBookingParams() {
+  const params = new URLSearchParams(window.location.search);
+  const saved = JSON.parse(sessionStorage.getItem("ECS_SEARCH") || "{}");
+
+  const city = (params.get("city") || saved.city || "paris").toLowerCase();
+  const date = params.get("date") || saved.date || "";
+
+  return {
+    city,
+    date,
+    adults: Math.max(1, parseInt(params.get("adults") || saved.adults || "1", 10)),
+    children: Math.max(0, parseInt(params.get("children") || saved.children || "0", 10)),
+    toddlers: Math.max(0, parseInt(params.get("toddlers") || saved.toddlers || "0", 10)),
+    babies: Math.max(0, parseInt(params.get("babies") || saved.babies || "0", 10)),
+  };
+}
+
+function setHeroPhotoWhenReady(textQuery) {
+  let tries = 0;
+  const timer = setInterval(async () => {
+    tries += 1;
+
+    if (window.google?.maps?.places) {
+      clearInterval(timer);
+      try {
+        await setHeroPhotoFromPlaces(textQuery);
+      } catch (err) {
+        console.warn("Hero image error:", err);
+      }
+      return;
+    }
+
+    if (tries > 80) {
+      clearInterval(timer);
+    }
+  }, 100);
+}
+
+async function setHeroPhotoFromPlaces(textQuery) {
+  const hero = document.querySelector(".package-image");
+  if (!hero || !window.google?.maps?.places) return;
+
+  await google.maps.importLibrary("places");
+
+  const { places } = await google.maps.places.Place.searchByText({
+    textQuery,
+    maxResultCount: 1,
+    fields: ["photos"],
+  });
+
+  const photo = places?.[0]?.photos?.[0];
+  if (!photo) return;
+
+  const url = photo.getURI({ maxWidth: 1400, maxHeight: 800 });
+
+  hero.style.backgroundImage =
+    `linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.18)), url("${url}")`;
+  hero.style.backgroundSize = "cover";
+  hero.style.backgroundPosition = "center";
+}
+
+function setupThankYouPage() {
+  const destinationEl = document.getElementById("bookingDestination");
+  const guestsEl = document.getElementById("bookingGuests");
+  const packageEl = document.getElementById("bookingPackage");
+  if (!destinationEl || !guestsEl || !packageEl) return;
+
+  const params = new URLSearchParams(window.location.search);
+
+  const city = params.get("city");
+  const adults = parseInt(params.get("adults") || "1", 10);
+  const children = parseInt(params.get("children") || "0", 10);
+  const toddlers = parseInt(params.get("toddlers") || "0", 10);
+  const babies = parseInt(params.get("babies") || "0", 10);
+  const tier = params.get("tier");
+
+  if (city) {
+    destinationEl.textContent = titleCaseCity(city);
+  }
+
+  let guestsText = `${adults} adult${adults > 1 ? "s" : ""}`;
+  if (children > 0) guestsText += ` · ${children} ${children === 1 ? "child" : "children"}`;
+  if (toddlers > 0) guestsText += ` · ${toddlers} toddler${toddlers > 1 ? "s" : ""}`;
+  if (babies > 0) guestsText += ` · ${babies} bab${babies === 1 ? "y" : "ies"}`;
+  guestsEl.textContent = guestsText;
+
+  if (tier) {
+    packageEl.textContent = tier.charAt(0).toUpperCase() + tier.slice(1);
+  }
+}
+
+function titleCaseCity(slug) {
+  if (!slug) return "";
+  return slug
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
