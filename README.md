@@ -23,6 +23,7 @@ Furthermore, this project was built in thought of allowing user to research diff
     - [Features To Implement](#features-to-implement)
 3. [Technologies Used](#technologies-used)
 4. [Testing](#testing)
+    - [Code Validation](#code-validation)
     - [Bugs discovered](#bugs-discovered)
 5. [Deployment](#deployment)
     - [How To Run The Project Locally](#how-to-run-the-project-locally)
@@ -131,6 +132,19 @@ Recently, Bootstrap implemented classes to allow use of flexbox. I implemented s
 Markdown language was used within my README.md file. It was used to apply content and apply layout and structure to the file. 
 
 # Testing
+
+## Code Validation 
+
+- ![index.html validation](./assets/images/index.html-validator.png)
+
+- ![destinations.html validation](./assets/images/destinations.html-validator.png)
+
+- ![book.hmtl validation](./assets/images/book.html-validator.png)
+
+- ![thank-you.html validation](./assets/images/thank-you.html-validator.png)
+
+- ![stlye.css validation](./assets/images/css-validator.png)
+
 
 ## Site Screenshots
 
