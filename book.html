@@ -63,7 +63,7 @@
 
 <!-- MAIN -->
 <section class="container mb-5">
-  <div class="row g-4">
+  <form id="bookingForm" class="row g-4">
 
     <!-- LEFT: PACKAGE DETAILS -->
     <div class="col-lg-7">
@@ -195,16 +195,16 @@
 
         <div class="row g-3">
           <div class="col-md-6">
-            <input class="form-control" placeholder="First name" required />
+            <input class="form-control" type="text" name="firstName" placeholder="First name" required />
           </div>
           <div class="col-md-6">
-            <input class="form-control" placeholder="Last name" required />
+            <input class="form-control" type="text" name="lastName" placeholder="Last name" required />
           </div>
           <div class="col-md-6">
-            <input class="form-control" type="email" placeholder="Email" required />
+            <input class="form-control" type="email" name="email" placeholder="Email" required />
           </div>
           <div class="col-md-6">
-            <input class="form-control" type="tel" placeholder="Phone (optional)" />
+            <input class="form-control" type="tel" name="phone" placeholder="Phone" required />
           </div>
         </div>
       </div>
@@ -243,9 +243,9 @@
           <strong id="summaryPrice">£149</strong>
         </div>
 
-        <a href="thank-you.html" class="btn btn-danger w-100 mt-3" id="confirmBtn" aria-label="Confirm booking and continue">
+        <button type="submit" class="btn btn-danger w-100 mt-3" id="confirmBtn" aria-label="Confirm booking and continue">
           Confirm & Continue
-        </a>
+        </button>
 
         <small class="text-muted d-block mt-2 text-center">
           No payment required yet (demo checkout).
@@ -253,7 +253,7 @@
       </div>
     </div>
 
-  </div>
+  </form>
 
 
 

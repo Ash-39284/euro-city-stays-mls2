@@ -383,6 +383,7 @@ function setupBookPage() {
   const checkIn = document.getElementById("checkIn");
   const checkOut = document.getElementById("checkOut");
   if (!checkIn || !checkOut) return;
+  const bookingForm = document.getElementById("bookingForm");
 
   const adultsSel = document.getElementById("adults");
   const childrenSel = document.getElementById("children");
@@ -394,7 +395,6 @@ function setupBookPage() {
   const summaryTier = document.getElementById("summaryTier");
   const summaryPrice = document.getElementById("summaryPrice");
   const summaryCity = document.getElementById("summaryCity");
-  const confirmBtn = document.getElementById("confirmBtn");
 
   const prices = { basic: 149, plus: 199, premium: 249 };
   const p = getBookingParams();
@@ -454,9 +454,7 @@ function setupBookPage() {
     summaryPrice.textContent = `£${prices[selected]}`;
   }
 
-  function updateConfirmLink() {
-    if (!confirmBtn) return;
-
+  function buildThankYouUrl() {
     const selectedTier = document.querySelector('input[name="tier"]:checked')?.value || "basic";
 
     const params = new URLSearchParams({
@@ -470,33 +468,42 @@ function setupBookPage() {
       checkout: checkOut.value || "",
     });
 
-    confirmBtn.href = `thank-you.html?${params.toString()}`;
+    return `thank-you.html?${params.toString()}`;
   }
 
   [checkIn, checkOut].forEach((el) => el.addEventListener("change", () => {
     updateDates();
-    updateConfirmLink();
   }));
 
   [adultsSel, childrenSel, toddlersSel, babiesSel].forEach((el) => {
     if (!el) return;
     el.addEventListener("change", () => {
       updateGuests();
-      updateConfirmLink();
     });
   });
 
   document.querySelectorAll('input[name="tier"]').forEach((radio) => {
     radio.addEventListener("change", () => {
       updateTier();
-      updateConfirmLink();
     });
   });
+
+  if (bookingForm) {
+    bookingForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      if (!bookingForm.checkValidity()) {
+        bookingForm.reportValidity();
+        return;
+      }
+
+      window.location.href = buildThankYouUrl();
+    });
+  }
 
   updateDates();
   updateGuests();
   updateTier();
-  updateConfirmLink();
 
   const query = `${cityName} city`;
   setHeroPhotoWhenReady(query);
