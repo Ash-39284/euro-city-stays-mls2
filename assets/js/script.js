@@ -321,6 +321,7 @@ async function hydrateCityImages() {
   if (!window.google?.maps?.places) return;
 
   const cards = document.querySelectorAll(".place-card");
+  const placeholderPrefix = "data:image/gif;base64,R0lGODlhAQAB";
 
   for (const card of cards) {
     const lat = parseFloat(card.dataset.lat);
@@ -328,7 +329,9 @@ async function hydrateCityImages() {
 
     const img = card.querySelector("img.place-photo");
     if (!img || Number.isNaN(lat) || Number.isNaN(lng)) continue;
-    if (img.getAttribute("src")) continue;
+    const currentSrc = img.getAttribute("src") || "";
+    const isPlaceholder = currentSrc.startsWith(placeholderPrefix);
+    if (currentSrc && !isPlaceholder) continue;
 
     try {
       const { places } = await google.maps.places.Place.searchNearby({
