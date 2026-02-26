@@ -297,6 +297,22 @@ body{
   border: 1px solid rgba(255,255,255,0.25);
 }
 
+/* thank-you text styling */
+
+.thank-you-txt{
+  background-color: #FFA239;
+  color: #FEEE91;
+  border-radius: 28px;
+  text-align: center;
+}
+
+#thnx{
+  padding: 24px 24px 32px 32px;
+}
+
+#thnx-sub{
+ padding-bottom: 24px;
+}
 
 
 /* mobile media query */
