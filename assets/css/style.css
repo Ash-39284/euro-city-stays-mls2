@@ -298,8 +298,18 @@ body{
 }
 
 /* Thank-you page */
+body.thank-you-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .thank-you-page {
   background: linear-gradient(180deg, #fff6e5 0%, #fff 100%);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 2.5rem 0;
 }
 
 .thank-you-wrap {
@@ -360,6 +370,21 @@ body{
 @media (max-width: 768px) {
   .thank-you-title {
     font-size: 1.7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .summary-guests-line {
+    align-items: flex-start;
+  }
+
+  #bookingGuests {
+    display: block;
+    max-width: 58%;
+    text-align: right;
+    line-height: 1.35;
+    font-size: 0.92rem;
+    word-break: break-word;
   }
 }
 
