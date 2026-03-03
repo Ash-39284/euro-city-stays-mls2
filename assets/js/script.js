@@ -1,12 +1,14 @@
 let map;
 let poiMarkers = [];
 
-window.addEventListener("DOMContentLoaded", () => {
-  setupHomePage();
-  setupDestinationsPage();
-  setupBookPage();
-  setupThankYouPage();
-});
+if (typeof window !== "undefined") {
+  window.addEventListener("DOMContentLoaded", () => {
+    setupHomePage();
+    setupDestinationsPage();
+    setupBookPage();
+    setupThankYouPage();
+  });
+}
 
 function setupHomePage() {
   const form = document.getElementById("searchForm");
@@ -351,30 +353,32 @@ async function hydrateCityImages() {
   }
 }
 
-window.showAttractions = (btn) => openCard(btn.closest(".place-card"), "tourist_attraction");
-window.showRestaurants = (btn) => openCard(btn.closest(".place-card"), "restaurant");
-window.showHotels = (btn) => openCard(btn.closest(".place-card"), "lodging");
+if (typeof window !== "undefined") {
+  window.showAttractions = (btn) => openCard(btn.closest(".place-card"), "tourist_attraction");
+  window.showRestaurants = (btn) => openCard(btn.closest(".place-card"), "restaurant");
+  window.showHotels = (btn) => openCard(btn.closest(".place-card"), "lodging");
 
-window.bookCity = (btn) => {
-  const card = btn.closest(".place-card");
-  if (!card) return;
+  window.bookCity = (btn) => {
+    const card = btn.closest(".place-card");
+    if (!card) return;
 
-  const city = (card.dataset.city || "").toLowerCase();
-  if (!city) return;
+    const city = (card.dataset.city || "").toLowerCase();
+    if (!city) return;
 
-  const saved = JSON.parse(sessionStorage.getItem("ECS_SEARCH") || "{}");
+    const saved = JSON.parse(sessionStorage.getItem("ECS_SEARCH") || "{}");
 
-  const params = new URLSearchParams({
-    city,
-    date: saved.date || "",
-    adults: String(saved.adults ?? 1),
-    children: String(saved.children ?? 0),
-    toddlers: String(saved.toddlers ?? 0),
-    babies: String(saved.babies ?? 0),
-  });
+    const params = new URLSearchParams({
+      city,
+      date: saved.date || "",
+      adults: String(saved.adults ?? 1),
+      children: String(saved.children ?? 0),
+      toddlers: String(saved.toddlers ?? 0),
+      babies: String(saved.babies ?? 0),
+    });
 
-  window.location.href = `book.html?${params.toString()}`;
-};
+    window.location.href = `book.html?${params.toString()}`;
+  };
+}
 
 function formatType(type) {
   if (type === "restaurant") return "🍽 Restaurant";
@@ -609,4 +613,36 @@ function titleCaseCity(slug) {
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
+}
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = {
+    setupHomePage,
+    setupGuestsDropdown,
+    setupDestinationsPage,
+    initMapWhenReady,
+    initMap,
+    attachCardClickHandlers,
+    autoOpenCityFromSearch,
+    openCard,
+    collapseAllCards,
+    fetchPOIs,
+    clearPoiMarkers,
+    hydrateCityImages,
+    formatType,
+    setupBookPage,
+    getBookingParams,
+    setHeroPhotoWhenReady,
+    setHeroPhotoFromPlaces,
+    setupThankYouPage,
+    titleCaseCity,
+    __setMap: (value) => {
+      map = value;
+    },
+    __getMap: () => map,
+    __setPoiMarkers: (value) => {
+      poiMarkers = value;
+    },
+    __getPoiMarkers: () => poiMarkers,
+  };
 }

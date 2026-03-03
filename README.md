@@ -131,7 +131,51 @@ Recently, Bootstrap implemented classes to allow use of flexbox. I implemented s
 
 Markdown language was used within my README.md file. It was used to apply content and apply layout and structure to the file. 
 
+- Jest
+
+Jest is used for JavaScript unit testing in this project. Tests are stored in `assets/js/script.test.js` and run against functions in `assets/js/script.js`.
+
 # Testing
+
+## JavaScript Unit Testing (Jest)
+
+To run JavaScript tests:
+
+1. Install Node.js (LTS) if it is not already installed.
+2. Run `npm install`
+3. Run `npm test`
+
+Included test file:
+
+- `assets/js/script.test.js`
+
+This test suite covers every exported function in `assets/js/script.js`:
+
+- `setupHomePage()`
+- `setupGuestsDropdown()`
+- `setupDestinationsPage()`
+- `initMapWhenReady()`
+- `initMap()`
+- `attachCardClickHandlers()`
+- `autoOpenCityFromSearch()`
+- `openCard()`
+- `collapseAllCards()`
+- `fetchPOIs()`
+- `clearPoiMarkers()`
+- `hydrateCityImages()`
+- `formatType()`
+- `setupBookPage()`
+- `getBookingParams()`
+- `setHeroPhotoWhenReady()`
+- `setHeroPhotoFromPlaces()`
+- `setupThankYouPage()`
+- `titleCaseCity()`
+
+Current test status:
+
+- `19` tests passing in `1` test suite (`npm test`)
+
+![Jest testing](./assets/images/jest-test.png)
 
 ## Code Validation 
 
@@ -307,8 +351,6 @@ The API key is intergrated with Google maps, Google Places and Google Places (Ne
 ## Acknowledgements
 
 This project was coded and completed by Ashley Roberts (2026)
-
-
 
 
 
