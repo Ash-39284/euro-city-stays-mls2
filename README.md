@@ -25,6 +25,9 @@ Furthermore, this project was built in thought of allowing user to research diff
 4. [Testing](#testing)
     - [Code Validation](#code-validation)
     - [Bugs discovered](#bugs-discovered)
+    - [Manual Testing](#manual-testing)
+    - [Automated Testing](#automated-testing)
+    - [JavaScript Unit Testing (Jest)](#javascript-unit-testing-jest)
 5. [Deployment](#deployment)
     - [How To Run The Project Locally](#how-to-run-the-project-locally)
 6. [Credits](#credits)
@@ -276,6 +279,66 @@ This is the code that fixed the error:
 
 `data-lng="12.5683"`
 
+# Manual Testing
+
+Manual testing was completed across desktop, tablet, and mobile viewport sizes using browser developer tools and real user flows from search to booking confirmation.
+
+| Area Tested | Test Action | Expected Result | Result |
+|---|---|---|---|
+| Navigation links | Click `Home`, `Destinations`, `BOOK NOW`, and logo links | Each route opens the correct page with no broken links | Pass |
+| Home page validation | Submit search form with no destination selected | User sees alert: `Please select a city.` and form is not submitted | Pass |
+| Guest dropdown controls | Increase/decrease adults, children, toddlers, babies from guest selector | Counts update correctly, adults do not go below 1, summary updates | Pass |
+| Search flow | Submit valid city from home page search | User is routed to `destinations.html?city=<city>` | Pass |
+| Destination card interaction | Click a destination card and then a different card | Active card expands, previous card collapses, POI list updates | Pass |
+| POI filters | Click Attractions / Food / Hotels filters on a destination card | Related nearby places are rendered for the selected category | Pass |
+| Map behaviour | Open a destination card with map loaded | Map pans/zooms to selected city and shows place markers | Pass |
+| Booking page prefill | Open `book.html` with query params from search | City, date and guest values are prefilled in booking summary | Pass |
+| Booking tier updates | Switch between package tiers | Price/tier summary updates immediately | Pass |
+| Thank-you page summary | Complete booking form submission | `thank-you.html` shows destination, guests, and package tier | Pass |
+| Responsive layout | Test mobile, tablet, desktop widths | Layout remains readable, images and cards scale correctly | Pass |
+
+Notes from manual testing:
+- A previously identified card/map bug (`data-lang` typo) was fixed to `data-lng`, restoring Copenhagen card map behaviour.
+- A tablet image overlap issue was fixed by using `img-fluid` in Bootstrap.
+
+
+
+# Automated Testing
+
+Automated testing is implemented with **Jest** and focuses on JavaScript logic in `assets/js/script.js`.
+
+## Test Scope
+
+The suite in `assets/js/script.test.js` covers:
+- Home page setup and validation
+- Guest dropdown state updates
+- Destination page map initialisation and fallback handling
+- Destination card open/collapse behaviour
+- Nearby places fetch and marker cleanup
+- City image hydration via Google Places API mocks
+- Booking page query/sessionStorage parsing
+- Hero image loading helpers
+- Thank-you page summary rendering
+- Utility helpers such as city title formatting
+
+## How To Run
+
+1. Install dependencies:
+   `npm install`
+2. Run test suite:
+   `npm test`
+
+## Current Status
+
+Latest run result:
+- `1` test suite passed
+- `19` tests passed
+- `0` tests failed
+
+Command used:
+- `npm test -- --runInBand --watchAll=false`
+
+
 # Deployment 
 
 This project was built using VScode IDE. It was commited using Git and pushed to GitHub using the terminal to commit and push to the GitHub repository. 
@@ -351,6 +414,5 @@ The API key is intergrated with Google maps, Google Places and Google Places (Ne
 ## Acknowledgements
 
 This project was coded and completed by Ashley Roberts (2026)
-
 
 
