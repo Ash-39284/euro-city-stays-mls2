@@ -4,6 +4,10 @@
   "private": true,
   "description": "Euro City Stays static site with Jest tests",
   "scripts": {
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:html",
+    "lint:js": "node assets/js/lint.js js",
+    "lint:css": "node assets/js/lint.js css",
+    "lint:html": "node assets/js/lint.js html",
     "test": "jest",
     "test:watch": "jest --watch"
   },

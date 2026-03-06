@@ -131,6 +131,12 @@ function setupDestinationsPage() {
   initMapWhenReady();
 }
 
+function setMapStatusMessage(message) {
+  const mapEl = document.getElementById("map");
+  if (!mapEl) return;
+  mapEl.textContent = message;
+}
+
 function initMapWhenReady() {
   let tries = 0;
   const timer = setInterval(async () => {
@@ -141,14 +147,14 @@ function initMapWhenReady() {
       try {
         await initMap();
       } catch (err) {
-        console.error("Map init failed:", err);
+        setMapStatusMessage("Map is unavailable right now. Please try again shortly.");
       }
       return;
     }
 
     if (tries > 80) {
       clearInterval(timer);
-      console.error("Google Maps did not load.");
+      setMapStatusMessage("Map is unavailable right now. Please try again shortly.");
     }
   }, 100);
 }
@@ -309,7 +315,6 @@ async function fetchPOIs(card, type) {
       map.setZoom(13);
     }
   } catch (err) {
-    console.error("Places error:", err);
     list.innerHTML = '<li class="text-danger">Error loading places</li>';
   }
 }
@@ -348,7 +353,7 @@ async function hydrateCityImages() {
 
       img.src = photo.getURI({ maxWidth: 600, maxHeight: 400 });
     } catch (err) {
-      console.warn("City image failed:", card.dataset.city, err);
+      // Ignore per-card photo lookup failures and keep placeholder image.
     }
   }
 }
@@ -543,7 +548,7 @@ function setHeroPhotoWhenReady(textQuery) {
       try {
         await setHeroPhotoFromPlaces(textQuery);
       } catch (err) {
-        console.warn("Hero image error:", err);
+        // Hero image is optional; keep default artwork if lookup fails.
       }
       return;
     }

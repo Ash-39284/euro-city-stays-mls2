@@ -142,14 +142,16 @@ describe("destinations and map setup", () => {
     expect(() => setupDestinationsPage()).not.toThrow();
   });
 
-  test("initMapWhenReady logs when google maps does not load", () => {
+  test("initMapWhenReady sets fallback map message when google maps does not load", () => {
+    document.body.innerHTML = `<div id="map"></div>`;
     jest.useFakeTimers();
-    const errSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     initMapWhenReady();
     jest.advanceTimersByTime(8200);
 
-    expect(errSpy).toHaveBeenCalledWith("Google Maps did not load.");
+    expect(document.getElementById("map").textContent).toBe(
+      "Map is unavailable right now. Please try again shortly."
+    );
     jest.useRealTimers();
   });
 

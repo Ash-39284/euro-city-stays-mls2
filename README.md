@@ -5,11 +5,11 @@
 
 # Introduction
 
-This project is developed for holiday seekers, to have a streamless and pleasent experience when booking and researching for a holiday destination. The project allows users to easily search for different destinations across europe, without confusion. It displays a simple layout to allow users of all computer literacy abilities to be able to use the features displayed with ease. 
+I built this project as a travel-booking concept site focused on quick discovery and a simple booking flow.
+The main idea was to let users search a destination, explore attractions/food/hotels with map support, and then complete a booking form with a live summary.
+I kept the UI straightforward on purpose so the journey feels clear from home page to confirmation page.
 
-Furthermore, this project was built in thought of allowing user to research diffrerent destinations right from within the site. Making booking a destination all the more streamless.  
-
-# Table of Cotents
+# Table of Contents
 
 1. [UX](#ux)
     - [Project Goals](#project-goals)
@@ -41,31 +41,35 @@ Furthermore, this project was built in thought of allowing user to research diff
 
 ## Project Goals
 
-The primary goal of this project is to allow users to have aa simple yet streamless experience when booking a holiday in Europe. I wanted to allow users to be able to easily book a destination whilst being able to research different destinations within the same place. Making booking a holiday a lot easier. 
+The project goal was to create a clean, beginner-friendly web app for planning a short European city break.
+I wanted users to do three things without confusion:
+1. search for a city,
+2. explore points of interest,
+3. complete a booking form with clear feedback.
 
 ## User Goals
 
 As a potential user I want:
 
-- To be able to find information about destinations offered
-- To be able easily search diffrent destinations
-- To be able to book easily with a clear and easy to understand booking page  
+- To quickly find destinations offered by the site.
+- To search and compare cities without leaving the website.
+- To complete a booking with a clear summary before final confirmation.
 
 
 ## User Stories
 
 As a potential user I want:
 
-- To be able to view different destinations.
-- See available attractions, resturaunts and hotels at specific locations
-- Be able to make a booking and easily see a summary of the booking before booking
+- To browse different destination cards.
+- To view attractions, restaurants and hotels near each destination.
+- To make a booking and review key details before submitting.
 
 
 ## Developer Goals
 
-- To create a fun and inviting project for individuals to view exciting destinations
-- Create a project that allows quick/ snappy information on different destinations 
-- Create a project to 
+- Build a complete multi-page front-end project using HTML, CSS, and JavaScript.
+- Practice working with third-party APIs (Google Maps / Places).
+- Add realistic testing and validation evidence in the README.
 
 ## Design Choices
 
@@ -85,60 +89,71 @@ As a potential user I want:
 
 ### Images
 
-I included images throughout the project, as this was a key feature to include within the destinations cards. Not only did it make the page look more attaractive, but allows users to see relevant images alongside the information they are receiving.
+Destination cards and homepage visuals are image-led to make browsing feel more engaging and less text-heavy.
 
 ### Interactive Places Map
 
-This was an important feature I wanted to implement as it added some interactivity to the project. Whilst a simple featue but adding a lot of value to the customer. Being able to see where different places are in terms of there booking planning journey. 
+The map is the core interactive feature. Users can open a city card and view nearby places by type (attractions, food, hotels), which makes the page feel useful rather than static.
 
 ### Booking Form
 
-I included a booking form as part of the user journey despite not being able link it to a payemnt system as it allows the user to see a full summary of there booking experience and also show basic functionality of the site and where it can be developed further.
+The booking form is a front-end flow only (no payment integration), but it supports real user interaction:
+date selection, guest counts, package tier selection, and a confirmation summary page.
 
 ## Features To Implement
 
 ### Link Booking page to payment secure sequence
 
-Although I dont't currently posses the skills to implement a background payment system. I believe to round off this project. It needs to have the complete ability to book and pay for a holiday. As the current project allows the research and ability to set up a booking. This is something that needs to be implemented next in order for the user journey to be completed.
+The next major step would be adding a secure checkout flow.
+At the moment, the booking journey is intentionally a demo flow that ends at confirmation.
 
 ### Map and selected card view on one page view 
 
-As it stands, when a destination card is selected. The user has to scroll down to the bottom of the page, to see the interactive map. To improve UX this feature needs to be implemented so users have all available information directly in front of them.
+At the moment, users may still need to scroll to switch between card content and map context.
+I would like to improve this with a tighter side-by-side layout on larger screens.
 
 ### Be able to track/ book live flights from home search bar
 
-In order to make this project more accurate. I'd like to implement live flight tracking to the search bar and booking page. This is so when users book holidays through this site. They can be assured that all information is correct and up to date. This also improves the user journey as it continues to add the information already available within the project. 
+A future enhancement would be adding live flight data (search and pricing) to make the product feel more complete.
 
 # Technologies Used
 
 - HTML
 
-HTML5 was used within the index.html and form.html files within this project. I used this technology to apply content to my project.
+Used for semantic page structure across all views (`index`, `destinations`, `book`, `thank-you`).
 
 - CSS
 
-CSS3 was used within the style.css file within this project. I used this to style the project with colours, fonts and layout. I also used CSS to re-engineer some bootstrap elements and fontawesome icons to match the styling of my project.
+Used for project-specific styling, layout refinements, and responsive behaviour in `assets/css/style.css`.
 
 - JavaScript
 
-Javascript was used within the destinations.html and book.html files. This was inline JavaScript to make it more manageable when linking the search elements and information storage when linking up the project. 
-JavaScript was also used externally within the script.js files to handle the destination cards function, store the API key and write the fucntions for the map elements.
+JavaScript is organised in external files inside `assets/js/` and loaded near the end of each HTML page.
+The main interactive logic is in `assets/js/script.js` and is responsible for form handling, map behaviour, booking summary updates, and thank-you page rendering.
 
 - Bootstrap
 
-Bootstrap v5.3 was used within the index.html and the form.html to implement elements such as the navbar, which was re-engnineered using HTML and CSS. I also used Bootstrap to implement the grid layout system througout the project. 
-
-Recently, Bootstrap implemented classes to allow use of flexbox. I implemented some of this within the footer section of the from.html file. 
+Bootstrap v5.3 is used for base components (navbar, layout grid, spacing utilities) and responsive structure.
 
 - Markdown
 
-Markdown language was used within my README.md file. It was used to apply content and apply layout and structure to the file. 
+Used to document planning, testing, deployment, and credits in this README.
 
 - Jest
 
 Jest is used for JavaScript unit testing in this project. Tests are stored in `assets/js/script.test.js` and run against functions in `assets/js/script.js`.
 
 # Testing
+
+## Testing Approach
+
+This project uses both **automated** and **manual** testing:
+
+- Automated testing is used for repeatable logic checks (form handling, query parsing, map helper behaviour, and utility functions). It is best used during active development and before every commit/deploy.
+
+- Manual testing is used for layout, usability, real user flows, and responsive behaviour across viewport sizes. It is best used after UI updates and as a final pre-deployment check.
+
+Both approaches are required because automated tests are fast and consistent, while manual testing validates real user experience and visual correctness.
 
 ## JavaScript Unit Testing (Jest)
 
@@ -192,6 +207,21 @@ Current test status:
 
 - ![stlye.css validation](./assets/images/css-validator.png)
 
+## Linting (JS, HTML, CSS)
+
+Lint checks are run with:
+
+- `npm run lint:js`
+- `npm run lint:css`
+- `npm run lint:html`
+- `npm run lint`
+
+Latest lint run (`npm run lint`):
+
+- JavaScript: pass (`3` files)
+- CSS: pass (`1` file)
+- HTML: pass (`4` files)
+
 
 ## Site Screenshots
 
@@ -203,13 +233,15 @@ Current test status:
 
 ## Site Loading Times
 
-When planning the project I was conscious on ensuring that the load times for this project were kept optimal. Especially with the inclusion of the video and the images. I used Lighthouse in google dev tools to test this. The results are below. 
+I checked performance with Lighthouse in Chrome DevTools during development, mainly because the project uses multiple images and external scripts.
+The latest report screenshot is below.
 
 ![LighHouse Report](./assets/images/lighthouse-report.png)
 
 
 ## Navigation
-Throughout the development of this project. I ensured that all buttons and navigation bar elements were linked correctly and working as intended. Below is a table showing all buttons and routes tested and confirmed to be working correctly. 
+During development I repeatedly tested all links/buttons to confirm routing worked as expected.
+The table below records the final check.
 
 | Button | Destination | Working |
 |--------|-------------|---------|
@@ -225,9 +257,8 @@ Throughout the development of this project. I ensured that all buttons and navig
 
 ## Responsiveness
 
-For this project I used Bootstrap to ensure the majority of the elements were responsive to smaller and medium sized screensizes. 
-
-I also implemented some mediaquery's within the style.css file as I needed to make some more direct styling adjustments to fit all of the content on to smaller mobile screens. Using media query's seperately for this made it easier and more manageable fix. 
+Bootstrap handles most responsive behaviour in this project.
+I also added custom media queries in `style.css` for areas that needed tighter control (image spacing, card layout, and page-level spacing on small screens).
 
 ## Mobile View
 
@@ -248,7 +279,7 @@ I also implemented some mediaquery's within the style.css file as I needed to ma
 
 # Bugs discovered
 
-The first bug I encountered was the images section on index.html page were overlapping on tablet size screens. 
+The first bug I hit was image overlap on the home page at tablet widths.
 
 ![Overlapping images](./assets/images/overlap-issue.png)
 
@@ -258,7 +289,7 @@ Code used with the issues:
         <img  src="./assets/images/aero-view.jpg" class="image-fluid rounded-4" alt="view of a country landscape from an aeroplane">
       </div>`
 
-This code was orignally used. I used bootstrap here to try to make the layout responsive on small devices. 
+This was my original code. I was trying to keep the layout responsive with Bootstrap classes.
 
 The code to fix it:
 
@@ -267,11 +298,11 @@ The code to fix it:
         <img  src="./assets/images/aero-view.jpg" class="img-fluid rounded-4" alt="view of a country landscape from an aeroplane">
       </div>`
 
-The second bug I encountered was when I connected the cards to the google maps API the "Copenhagen" card wouldn't interact with the map. The error is show below:
+The second bug happened after wiring destination cards to the Google Maps API: the Copenhagen card did not interact with the map.
 
 ![Copenhagen card issue](./assets/images/card-issue.png)
 
-The code issue was that I put in the `data-lng` class in incorrect. This was the issue code:
+The issue was a typo in the dataset attribute:
 
 `data-lang="'12.5683"`
 
@@ -338,35 +369,48 @@ Latest run result:
 Command used:
 - `npm test -- --runInBand --watchAll=false`
 
+## Development vs Deployment Verification
+
+To confirm the deployed version matches development:
+
+1. Run local checks:
+   - `npm run lint`
+   - `npm test -- --runInBand --watchAll=false`
+2. Open the deployed site and repeat the manual journey:
+   - home search
+   - destination interactions
+   - booking form submission
+   - thank-you summary checks
+3. Compare expected outcomes with the manual test table in this README.
+
+Current status:
+
+- Development checks: pass (`lint` and `test`)
+- Manual flow checks: pass (see Manual Testing table)
+- No internal JavaScript errors are intentionally emitted to console in normal fallback paths; failures are handled with UI fallbacks.
+
 
 # Deployment 
 
-This project was built using VScode IDE. It was commited using Git and pushed to GitHub using the terminal to commit and push to the GitHub repository. 
+I developed this project in VS Code, used Git for version control, and pushed to GitHub.
+Deployment is via GitHub Pages from the repository:
+[Ash-39284/euro-city-stays-mls2](https://github.com/Ash-39284/euro-city-stays-mls2)
 
-To deploy this project to it's [GitHub repository](https://github.com/Ash-39284/euro-city-stays-mls2). These following steps were taken.
-
-1. Login to GitHb
-2. From the list of repositories on the left side of the screen select **Ash-39284/portfolio-project**
-3. From the menu bar at the top of the page. Selcet **settings**.
-4. Scroll down and select **GitHub Pages**.
-5. Under source, select the drop-down menu that says **none** and select **Master Branch**.
-6. After selecting **Master Branch** the page should refresh automatically. If not, manually refresh. After a couple of moments the link to the deployed website should display on the top of this page. 
+Deployment steps used:
+1. Open the repository on GitHub.
+2. Go to `Settings` -> `Pages`.
+3. Under `Build and deployment`, set source to `Deploy from a branch`.
+4. Select the branch used for deployment (for this project: `master`) and save.
+5. Wait for GitHub Pages to publish and refresh the page to get the live site URL.
 
 
 ## How To Run The Project Locally
 
-To clone this project you will need. 
-
-1. A GitHub account. [Create a GitHub account here.](https://github.com/signup)
-2. Open Google Chrome browser. 
-
-To work on the project code within a local IDE (e.g. VScode) follow these steps:
-
-1. Click this link the [GitHub Repository](https://github.com/Ash-39284/portfolio-project)
-2. Click the green code drop down button and copy the https url. 
-3. In your local IDE open the terminal. 
-4. Change the current working directory to the location where you want the cloned directory to be made. 
-5. Type 'git clone ' then paste the link you copied from step 2. 
+1. Open the repository: [GitHub Repository](https://github.com/Ash-39284/portfolio-project)
+2. Copy the HTTPS clone URL from the green `Code` button.
+3. In your terminal, move to the directory where you want the project.
+4. Run `git clone <repo-url>`.
+5. Open the project in your IDE.
 
 # Credits
 
@@ -376,11 +420,29 @@ To work on the project code within a local IDE (e.g. VScode) follow these steps:
 
 - The colour hex numbers were taken from [Colour Hunt](https://colorhunt.co/palette/8ce4fffeee91ffa239ff5656)
 
+## External vs Project Code
+
+Project-authored interactive code:
+
+- `assets/js/script.js`
+- `assets/js/script.test.js`
+- `assets/css/style.css`
+- HTML pages in the project root
+
+External source code/libraries:
+
+- Bootstrap CSS/JS loaded via CDN in HTML pages
+- jQuery loaded via CDN (`index.html`, `destinations.html`)
+- Google Maps/Places API loaded via CDN script tags
+- Font Awesome kit loaded via CDN (`destinations.html`)
+
+External code is only included via script/link imports and is kept separate from project-authored source files.
+
 ## Content
 
 All text within the project is sourced by me (Ashley Roberts).
 
-The colour pallet was sourced from [Colour Hunt](https://colorhunt.co/palette/8ce4fffeee91ffa239ff5656)
+The colour palette was sourced from [Colour Hunt](https://colorhunt.co/palette/8ce4fffeee91ffa239ff5656)
 
 ## Code 
 
@@ -388,7 +450,7 @@ The colour pallet was sourced from [Colour Hunt](https://colorhunt.co/palette/8c
 
 - The colour hex numbers were taken from [Colour Hunt](https://colorhunt.co/palette/8ce4fffeee91ffa239ff5656)
 
-- The API key was built and sourced from Google cloud console [Google Cloud Console](https://console.cloud.google.com/google/maps-apis/api-list?project=project-45b0c08b-fd0a-4d9f-988)
+- The API key was created in Google Cloud Console: [Google Cloud Console](https://console.cloud.google.com/google/maps-apis/api-list?project=project-45b0c08b-fd0a-4d9f-988)
 
 ## Images
 
@@ -409,10 +471,9 @@ The colour pallet was sourced from [Colour Hunt](https://colorhunt.co/palette/8c
 
 ## API's
 
-The API key is intergrated with Google maps, Google Places and Google Places (New). [Google API KEY](https://console.cloud.google.com/google/maps-apis/credentials?project=project-45b0c08b-fd0a-4d9f-988)
+The API key is integrated with Google Maps and Google Places APIs.
+[Google API Key Console](https://console.cloud.google.com/google/maps-apis/credentials?project=project-45b0c08b-fd0a-4d9f-988)
 
 ## Acknowledgements
 
 This project was coded and completed by Ashley Roberts (2026)
-
-
