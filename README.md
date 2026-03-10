@@ -215,8 +215,9 @@ Latest lint run (`npm run lint`):
 
 - JavaScript: pass (`3` files)
 - CSS: pass (`1` file)
-- HTML: pass (`4` files)
+- HTML: pass (`3` files)
 
+![JSlint validation screenshot](./assets/images/jslint-validation.png)
 
 ## Site Screenshots
 
@@ -382,6 +383,7 @@ Current status:
 - Development checks: pass (`lint` and `test`)
 - Manual flow checks: pass (see Manual Testing table)
 - No internal JavaScript errors are intentionally emitted to console in normal fallback paths; failures are handled with UI fallbacks.
+
 
 
 # Deployment 
