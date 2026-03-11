@@ -451,15 +451,27 @@ External code is only included via script/link imports and is kept separate from
 
 All text within the project is sourced by me (Ashley Roberts).
 
-The colour pallet was sourced from [Colour Hunt](https://colorhunt.co/palette/8ce4fffeee91ffa239ff5656)
+## Code
 
-## Code 
+### External Code References
 
-- The code for the navigation bar was taken from [Bootstrap](https://getbootstrap.com/docs/5.3/components/navbar/)
+- I took the navbar structure from the [Bootstrap documentation](https://getbootstrap.com/docs/5.3/components/navbar/#supported-content) and adapted it with my own colours and styling to match the project design.
 
-- The colour hex numbers were taken from [Colour Hunt](https://colorhunt.co/palette/8ce4fffeee91ffa239ff5656)
+- I used the [Bootstrap Dropdown component](https://getbootstrap.com/docs/5.3/components/dropdowns/) to build the guests selector on the home page search form, including the `autoClose: "outside"` option from the Bootstrap JavaScript API docs.
 
-- The API key was built and sourced from Google cloud console [Google Cloud Console](https://console.cloud.google.com/google/maps-apis/api-list?project=project-45b0c08b-fd0a-4d9f-988)
+- I used [Bootstrap v5.3](https://getbootstrap.com/docs/5.3/) throughout the project for the grid layout, buttons, form controls, and general page structure across all HTML pages.
+
+- I included [jQuery v3.7.1](https://jquery.com/) on the home and destinations pages, loaded via CDN.
+
+- I used the [Google Maps JavaScript API](https://developers.google.com/maps/documentation/javascript) to display the interactive map on the destinations page. I loaded it using `async`, `defer`, and `loading=async` as recommended in the Google documentation.
+
+- I used the [Google Places API (New)](https://developers.google.com/maps/documentation/places/web-service) to fetch nearby attractions, restaurants, and hotels for each destination card, and to load the hero image on the booking page.
+
+- I used [Font Awesome](https://fontawesome.com/) for icons on the destinations page, loaded via CDN.
+
+- I used [Jest v29](https://jestjs.io/) with `jest-environment-jsdom` to write and run the JavaScript unit tests for this project.
+
+- The colour hex values used throughout the project were sourced from [Colour Hunt](https://colorhunt.co/palette/8ce4fffeee91ffa239ff5656).
 
 ## Images
 
