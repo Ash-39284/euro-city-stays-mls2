@@ -215,7 +215,7 @@ Latest lint run (`npm run lint`):
 
 - JavaScript: pass (`3` files)
 - CSS: pass (`1` file)
-- HTML: pass (`3` files)
+- HTML: pass (`4` files)
 
 ![JSlint validation screenshot](./assets/images/jslint-validation.png)
 
@@ -304,6 +304,14 @@ The code issue was that I put in the `data-lng` class in incorrect. This was the
 This is the code that fixed the error:
 
 `data-lng="12.5683"`
+
+There is a bug discovered on the chrome dev tools console. 
+
+![JavaScript API bug](./assets/images/js-bug.png)
+
+A console warning appeared stating the Google Maps API had been loaded without `loading=async`. This was fixed by adding `async`, `defer`, and `loading=async` to the Maps script tag.
+
+This bug is fixed, however when initially loading the project it will appear in the console. To prevent this from showing in the console you need to hard refresh the page. This will clear the errors and show that all bugs have been fixed.
 
 # Manual Testing
 
