@@ -142,13 +142,11 @@ Jest is used for JavaScript unit testing in this project. Tests are stored in `a
 
 ## Testing Approach
 
-This project uses both **automated** and **manual** testing:
+For this project I used both manual and automated testing at different stages of development.
 
-- Automated testing is used for repeatable logic checks (form handling, query parsing, map helper behaviour, and utility functions). It is best used during active development and before every commit/deploy.
+Automated testing with Jest was used to test the JavaScript logic, things like form validation, guest counts, URL parameter parsing, and utility functions. This was useful during development as I could quickly check that my functions still worked after making changes, without having to click through the whole site every time.
 
-- Manual testing is used for layout, usability, real user flows, and responsive behaviour across viewport sizes. It is best used after UI updates and as a final pre-deployment check.
-
-Both approaches are required because automated tests are fast and consistent, while manual testing validates real user experience and visual correctness.
+Manual testing was used to check the parts that automated tests can't easily cover, like how the page looks, whether the map loads correctly, and whether the full user journey from searching to booking confirmation works as expected. I carried this out across different screen sizes using browser chrome developer tools.
 
 ## JavaScript Unit Testing (Jest)
 
@@ -329,7 +327,7 @@ Manual testing was completed across desktop, tablet, and mobile viewport sizes u
 | Booking page prefill | Open `book.html` with query params from search | City, date and guest values are prefilled in booking summary | Pass |
 | Booking tier updates | Switch between package tiers | Price/tier summary updates immediately | Pass |
 | Thank-you page summary | Complete booking form submission | `thank-you.html` shows destination, guests, and package tier | Pass |
-| Responsive layout | Test mobile, tablet, desktop widths | Layout remains readable, images and cards scale correctly | Pass |
+| Responsive layout | Test mobile (430px x 932px), tablet(1024px x 1366px), desktop widths(1440px x 932px) | Layout remains readable, images and cards scale correctly | Pass |
 
 Notes from manual testing:
 - A previously identified card/map bug (`data-lang` typo) was fixed to `data-lng`, restoring Copenhagen card map behaviour.
